@@ -41,6 +41,10 @@ function activate(context) {
         // The code you place here will be executed every time your command is executed
         // Display a message box to the user
         vscode.window.showInformationMessage('Hello World from CodeSFX!');
+        const path = require("path");
+        const sound = require('sound-play');
+        const filePath = path.join(context.extensionPath, 'sfx', 'vine-boom-sound-meme.mp3');
+        sound.play(filePath);
     });
     context.subscriptions.push(disposable);
 }

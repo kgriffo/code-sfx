@@ -2,9 +2,52 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+export function activate(context: vscode.ExtensionContext) {
+	console.log('CodeSFX is now active!');
+	
+	//vscode severity codes for different diagnostics
+	const err = 0;
+	const warn = 1;
+	const info = 2;
+	const hint = 3;
+
+	vscode.languages.onDidChangeDiagnostics((event) => {
+		const diagnostics = vscode.languages.getDiagnostics();
+		while(diagnostics.length > 0) {
+			let item = diagnostics.pop();
+			if(item != undefined)
+				if(item[1][0].severity === err) { 
+					const path = require("path");
+					const sound = require('sound-play');
+					const filePath = path.join(context.extensionPath, 'sfx', 'boom.mp3');
+					sound.play(filePath);
+				}
+				else if(item[1][0].severity === warn) { 
+					const path = require("path");
+					const sound = require('sound-play');
+					const filePath = path.join(context.extensionPath, 'sfx', 'bruh.mp3');
+					sound.play(filePath);
+				}
+				else if(item[1][0].severity === info) { 
+					const path = require("path");
+					const sound = require('sound-play');
+					const filePath = path.join(context.extensionPath, 'sfx', 'android.mp3');
+					sound.play(filePath);
+				}
+				else if(item[1][0].severity === hint) { 
+					const path = require("path");
+					const sound = require('sound-play');
+					const filePath = path.join(context.extensionPath, 'sfx', 'spongebob_horn.mp3');
+					sound.play(filePath);
+				}
+		}
+	});
+}
+
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+/* export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
@@ -24,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
-}
+} */
 
 // This method is called when your extension is deactivated
 export function deactivate() {}

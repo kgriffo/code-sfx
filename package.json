@@ -17,21 +17,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "package-explorer",
-          "title": "Package Explorer",
+          "id": "codesfx",
+          "title": "CodeSFX",
           "icon": "./node_modules/@vscode/codicons/src/icons/music.svg"
         }
       ]
     },
     "views": {
-      "package-explorer": [
+      "codesfx": [
         {
-          "id": "package-dependencies",
-          "name": "Dependencies"
-        },
-        {
-          "id": "package-outline",
-          "name": "Outline"
+          "id": "codesfx",
+          "name": "CodeSFX"
         }
       ]
     },

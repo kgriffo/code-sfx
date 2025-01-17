@@ -14,6 +14,27 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "package-explorer",
+          "title": "Package Explorer",
+          "icon": "./node_modules/@vscode/codicons/src/icons/music.svg"
+        }
+      ]
+    },
+    "views": {
+      "package-explorer": [
+        {
+          "id": "package-dependencies",
+          "name": "Dependencies"
+        },
+        {
+          "id": "package-outline",
+          "name": "Outline"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "codesfx.helloWorld",
@@ -46,6 +67,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
+    "@vscode/codicons": "^0.0.36",
     "sound-play": "^1.1.0"
   }
 }

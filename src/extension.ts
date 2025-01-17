@@ -3,7 +3,12 @@ import sound from "sound-play";
 import path from "path";
 
 // incomplete. the goal is to make a mutable SFX function
-function playSound(context: vscode.ExtensionContext) {}
+function playSFX(context: vscode.ExtensionContext, soundName: string) {
+  soundName = "";
+  let sfxFolder: string = "sfx";
+  const filePath = path.join(context.extensionPath, sfxFolder, soundName);
+  sound.play(filePath);
+}
 
 function getTerminalOutput(context: vscode.ExtensionContext) {
   vscode.commands
@@ -12,16 +17,19 @@ function getTerminalOutput(context: vscode.ExtensionContext) {
       vscode.commands
         .executeCommand("workbench.action.terminal.copySelection")
         .then(async () => {
-          let output = vscode.env.clipboard.readText();
-          if ((await output).includes("ZeroDivisionError")) {
-            const filePath = path.join(
+          let output: Thenable<string> = vscode.env.clipboard.readText();
+          if ((await output).includes("Error")) {
+            const filePath: string = path.join(
               context.extensionPath,
               "sfx",
               "doorbell.mp3"
             );
             sound.play(filePath);
+            vscode.commands.executeCommand(
+              "workbench.action.terminal.clearSelection"
+            );
           } else {
-            const filePath = path.join(
+            const filePath: string = path.join(
               context.extensionPath,
               "sfx",
               "iphone-chime.mp3"
@@ -47,14 +55,15 @@ export function activate(context: vscode.ExtensionContext) {
 
   // listens for diagnostics while coding; triggers sounds accordingly
   vscode.languages.onDidChangeDiagnostics(() => {
-    const diagnostics = vscode.languages.getDiagnostics();
+    const diagnostics: [vscode.Uri, vscode.Diagnostic[]][] =
+      vscode.languages.getDiagnostics();
     while (diagnostics.length > 0) {
       let diag = diagnostics.pop();
       if (diag !== undefined) {
         let diagArray = diag[1]; //array of diagnostics (diag[0] = uri)
         diagArray.forEach((item) => {
           if (item.severity === err) {
-            const filePath = path.join(
+            const filePath: string = path.join(
               context.extensionPath,
               "sfx",
               "notification-beep.mp3"
@@ -62,7 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
             sound.play(filePath);
           }
           if (item.severity === warn) {
-            const filePath = path.join(
+            const filePath: string = path.join(
               context.extensionPath,
               "sfx",
               "airplane-beep.mp3"
@@ -75,7 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // scans terminal output; triggers sounds accordingly
-  let disposable = vscode.commands.registerCommand(
+  let disposable: vscode.Disposable = vscode.commands.registerCommand(
     "codesfx.getTerminalOutput",
     () => {
       getTerminalOutput(context);

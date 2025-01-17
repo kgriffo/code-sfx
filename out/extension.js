@@ -32,7 +32,12 @@ const vscode = __importStar(require("vscode"));
 const sound_play_1 = __importDefault(require("sound-play"));
 const path_1 = __importDefault(require("path"));
 // incomplete. the goal is to make a mutable SFX function
-function playSound(context) { }
+function playSFX(context, soundName) {
+    soundName = "";
+    let sfxFolder = "sfx";
+    const filePath = path_1.default.join(context.extensionPath, sfxFolder, soundName);
+    sound_play_1.default.play(filePath);
+}
 function getTerminalOutput(context) {
     vscode.commands
         .executeCommand("workbench.action.terminal.selectAll")
@@ -41,9 +46,10 @@ function getTerminalOutput(context) {
             .executeCommand("workbench.action.terminal.copySelection")
             .then(async () => {
             let output = vscode.env.clipboard.readText();
-            if ((await output).includes("ZeroDivisionError")) {
+            if ((await output).includes("Error")) {
                 const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
                 sound_play_1.default.play(filePath);
+                vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
             }
             else {
                 const filePath = path_1.default.join(context.extensionPath, "sfx", "iphone-chime.mp3");

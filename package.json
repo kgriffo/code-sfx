@@ -39,6 +39,10 @@
       {
         "command": "codesfx.getTerminalOutput",
         "title": "CodeSFX: Get Terminal Output"
+      },
+      {
+        "command": "codesfx.toggleWhileCodingSFX",
+        "title": "CodeSFX: Toggle SFX"
       }
     ]
   },

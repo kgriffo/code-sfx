@@ -12,6 +12,7 @@ import {
 export function activate(context: vscode.ExtensionContext) {
   console.log("CodeSFX is now active!");
 
+  // sets up listener for "while coding" SFX feature
   updateDiagnosticsListener(context);
 
   // command disposables

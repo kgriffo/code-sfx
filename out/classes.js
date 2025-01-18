@@ -26,6 +26,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandButtons = void 0;
 const vscode = __importStar(require("vscode"));
 //class definitions
+/**
+ * Defines tree view of command buttons for CodeSFX
+ */
 class CommandButtons {
     constructor() { }
     onDidChangeTreeData;
@@ -41,6 +44,9 @@ class CommandButtons {
     }
 }
 exports.CommandButtons = CommandButtons;
+/**
+ * Defines command buttons
+ */
 class Button extends vscode.TreeItem {
     constructor(label, commandId, tooltip, icon) {
         super(label, vscode.TreeItemCollapsibleState.None);

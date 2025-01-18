@@ -31,6 +31,7 @@ const functions_1 = require("./functions");
 // activation function
 function activate(context) {
     console.log("CodeSFX is now active!");
+    // sets up listener for "while coding" SFX feature
     (0, functions_1.updateDiagnosticsListener)(context);
     // command disposables
     let getTerminalOutputDisp = vscode.commands.registerCommand("codesfx.getTerminalOutput", () => {

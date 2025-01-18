@@ -1,6 +1,9 @@
 import * as vscode from "vscode";
 
 //class definitions
+/**
+ * Defines tree view of command buttons for CodeSFX
+ */
 export class CommandButtons implements vscode.TreeDataProvider<Button> {
   constructor() {}
   onDidChangeTreeData?:
@@ -29,6 +32,9 @@ export class CommandButtons implements vscode.TreeDataProvider<Button> {
   }
 }
 
+/**
+ * Defines command buttons
+ */
 class Button extends vscode.TreeItem {
   constructor(
     label: string,

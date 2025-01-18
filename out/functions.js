@@ -36,7 +36,15 @@ const sound_play_1 = __importDefault(require("sound-play"));
 const path_1 = __importDefault(require("path"));
 // function variables
 exports.whileCodingSFX = true;
+// vscode severity codes for different diagnostics
+const err = 0;
+const warn = 1;
+const info = 2;
+const hint = 3;
 // functions
+/**
+ * Toggles "while coding" sfx feature
+ */
 function toggleWhileCodingSFX() {
     exports.whileCodingSFX = !exports.whileCodingSFX;
 }
@@ -47,6 +55,10 @@ function playSFX(context, soundName) {
     const filePath = path_1.default.join(context.extensionPath, sfxFolder, soundName);
     sound_play_1.default.play(filePath);
 }
+/**
+ * Grabs terminal output and plays sfx accordingly
+ * @param context - file context
+ */
 function getTerminalOutput(context) {
     vscode.commands
         .executeCommand("workbench.action.terminal.selectAll")
@@ -68,14 +80,9 @@ function getTerminalOutput(context) {
         });
     });
 }
-// vscode severity codes for different diagnostics
-const err = 0;
-const warn = 1;
-const info = 2;
-const hint = 3;
 /**
- * Updates diagnostic listener to toggle the "while coding" SFX feature
- * @param context
+ * Updates diagnostic listener and handles the "while coding" SFX feature
+ * @param context - file context
  */
 function updateDiagnosticsListener(context) {
     if (exports.diagnosticListener) {

@@ -2,6 +2,47 @@ import * as vscode from "vscode";
 import sound from "sound-play";
 import path from "path";
 
+//class definitions for command buttons
+export class CommandButtons implements vscode.TreeDataProvider<Button> {
+  constructor() {}
+  onDidChangeTreeData?:
+    | vscode.Event<void | Button | Button[] | null | undefined>
+    | undefined;
+  getTreeItem(element: Button): vscode.TreeItem | Thenable<vscode.TreeItem> {
+    return element;
+  }
+  getChildren(element: Button | undefined): vscode.ProviderResult<Button[]> {
+    const activeLanguage: string | undefined =
+      vscode.window.activeTextEditor?.document.languageId;
+    return [
+      new Button(
+        "Get Terminal Output",
+        "codesfx.getTerminalOutput",
+        "Grabs terminal output and plays sound effects",
+        new vscode.ThemeIcon("debug-start")
+      ),
+    ];
+  }
+}
+
+class Button extends vscode.TreeItem {
+  constructor(
+    label: string,
+    commandId: string,
+    tooltip?: string,
+    icon?: vscode.ThemeIcon
+  ) {
+    super(label, vscode.TreeItemCollapsibleState.None);
+    this.command = {
+      command: commandId,
+      title: label,
+    };
+    this.tooltip = tooltip || "";
+    this.iconPath = icon || new vscode.ThemeIcon("play-circle");
+  }
+}
+
+// functions
 // incomplete. the goal is to make a mutable SFX function
 function playSFX(context: vscode.ExtensionContext, soundName: string) {
   soundName = "";
@@ -60,23 +101,27 @@ export function activate(context: vscode.ExtensionContext) {
     while (diagnostics.length > 0) {
       let diag = diagnostics.pop();
       if (diag !== undefined) {
-        let diagArray = diag[1]; //array of diagnostics (diag[0] = uri)
-        diagArray.forEach((item) => {
+        let diagArray: vscode.Diagnostic[] = diag[1]; //array of diagnostics (diag[0] = uri)
+        diagArray.forEach((item: vscode.Diagnostic) => {
           if (item.severity === err) {
-            const filePath: string = path.join(
-              context.extensionPath,
-              "sfx",
-              "notification-beep.mp3"
-            );
-            sound.play(filePath);
+            setTimeout(() => {
+              const filePath: string = path.join(
+                context.extensionPath,
+                "sfx",
+                "notification-beep.mp3"
+              );
+              sound.play(filePath);
+            }, 1000);
           }
           if (item.severity === warn) {
-            const filePath: string = path.join(
-              context.extensionPath,
-              "sfx",
-              "airplane-beep.mp3"
-            );
-            sound.play(filePath);
+            setTimeout(() => {
+              const filePath: string = path.join(
+                context.extensionPath,
+                "sfx",
+                "airplane-beep.mp3"
+              );
+              sound.play(filePath);
+            }, 1000);
           }
         });
       }
@@ -91,6 +136,11 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // Register the Tree Data Provider
+  const commandButtonsProvider = new CommandButtons();
+  vscode.window.createTreeView("codesfx", {
+    treeDataProvider: commandButtonsProvider,
+  });
   context.subscriptions.push(disposable);
 }
 export function deactivate() {}

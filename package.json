@@ -33,10 +33,6 @@
     },
     "commands": [
       {
-        "command": "codesfx.helloWorld",
-        "title": "CodeSFX: Hello World"
-      },
-      {
         "command": "codesfx.getTerminalOutput",
         "title": "CodeSFX: Get Terminal Output"
       },

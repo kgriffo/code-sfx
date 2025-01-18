@@ -26,7 +26,7 @@ export class CommandButtons implements vscode.TreeDataProvider<Button> {
         "Toggle SFX",
         "codesfx.toggleWhileCodingSFX",
         "Toggles SFX that play while coding",
-        new vscode.ThemeIcon("")
+        new vscode.ThemeIcon("debug-stop")
       ),
     ];
   }

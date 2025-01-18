@@ -40,10 +40,10 @@ function activate(context) {
     let toggleWhileCodingSFXDisp = vscode.commands.registerCommand("codesfx.toggleWhileCodingSFX", () => {
         (0, functions_1.toggleWhileCodingSFX)();
         (0, functions_1.updateDiagnosticsListener)(context);
-        if (functions_1.whileCodingSFX === true) {
+        if (functions_1.whileCodingSFX) {
             vscode.window.showInformationMessage("SFX toggled on");
         }
-        if (functions_1.whileCodingSFX === false) {
+        if (!functions_1.whileCodingSFX) {
             vscode.window.showInformationMessage("SFX toggled off");
         }
     });

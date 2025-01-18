@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 import { CommandButtons } from "./classes";
 import {
-  toggleWhileCodingSFX,
   whileCodingSFX,
+  toggleWhileCodingSFX,
   getTerminalOutput,
   updateDiagnosticsListener,
   playSFX,
@@ -25,10 +25,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("codesfx.toggleWhileCodingSFX", () => {
       toggleWhileCodingSFX();
       updateDiagnosticsListener(context);
-      if (whileCodingSFX === true) {
+      if (whileCodingSFX) {
         vscode.window.showInformationMessage("SFX toggled on");
       }
-      if (whileCodingSFX === false) {
+      if (!whileCodingSFX) {
         vscode.window.showInformationMessage("SFX toggled off");
       }
     });

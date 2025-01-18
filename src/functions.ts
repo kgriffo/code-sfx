@@ -1,6 +1,6 @@
-import * as vscode from "vscode";
-import sound from "sound-play";
 import path from "path";
+import sound from "sound-play";
+import * as vscode from "vscode";
 
 // function variables
 export let whileCodingSFX: boolean = true;

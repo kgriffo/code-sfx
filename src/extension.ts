@@ -1,11 +1,10 @@
 import * as vscode from "vscode";
 import { CommandButtons } from "./classes";
 import {
-  whileCodingSFX,
-  toggleWhileCodingSFX,
   getTerminalOutput,
+  toggleWhileCodingSFX,
   updateDiagnosticsListener,
-  playSFX,
+  whileCodingSFX,
 } from "./functions";
 
 // activation function

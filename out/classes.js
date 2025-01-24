@@ -23,33 +23,32 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommandButtons = void 0;
+exports.CommandButtonsProvider = void 0;
 const vscode = __importStar(require("vscode"));
-//class definitions
 /**
- * Defines tree view of command buttons for CodeSFX
+ * Defines tree view of CodeSFX command buttons
  */
-class CommandButtons {
+class CommandButtonsProvider {
     constructor() { }
-    onDidChangeTreeData;
     getTreeItem(element) {
         return element;
     }
     getChildren(element) {
-        const activeLanguage = vscode.window.activeTextEditor?.document.languageId;
+        const activeLanguage = //for use later... maybe
+         vscode.window.activeTextEditor?.document.languageId;
         return [
-            new Button("Get Terminal Output", "codesfx.getTerminalOutput", "Grabs terminal output and plays sound effects", new vscode.ThemeIcon("debug-start")),
-            new Button("Toggle SFX", "codesfx.toggleWhileCodingSFX", "Toggles SFX that play while coding", new vscode.ThemeIcon("debug-stop")),
+            new CommandButton("Get Terminal Output", "codesfx.getTerminalOutput", "Grabs terminal output and plays sound effects", new vscode.ThemeIcon("debug-start")),
+            new CommandButton("Toggle SFX", "codesfx.toggleWhileCodingSFX", "Toggles SFX that play while coding", new vscode.ThemeIcon("debug-stop")),
         ];
     }
 }
-exports.CommandButtons = CommandButtons;
+exports.CommandButtonsProvider = CommandButtonsProvider;
 /**
- * Defines command buttons
+ * Defines buttons for CodeSFX commands
  */
-class Button extends vscode.TreeItem {
+class CommandButton extends vscode.TreeItem {
     constructor(label, commandId, tooltip, icon) {
-        super(label, vscode.TreeItemCollapsibleState.None);
+        super(label);
         this.command = {
             command: commandId,
             title: label,

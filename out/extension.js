@@ -31,24 +31,24 @@ const functions_1 = require("./functions");
 // activation function
 function activate(context) {
     console.log("CodeSFX is now active!");
-    // sets up listener for "while coding" SFX feature
-    (0, functions_1.updateDiagnosticsListener)(context);
+    // readies "while coding" SFX feature
+    (0, functions_1.whileCodingSFX)(context);
     // command disposables
     let getTerminalOutputDisp = vscode.commands.registerCommand("codesfx.getTerminalOutput", () => {
         (0, functions_1.getTerminalOutput)(context);
     });
     let toggleWhileCodingSFXDisp = vscode.commands.registerCommand("codesfx.toggleWhileCodingSFX", () => {
         (0, functions_1.toggleWhileCodingSFX)();
-        (0, functions_1.updateDiagnosticsListener)(context);
-        if (functions_1.whileCodingSFX) {
+        (0, functions_1.whileCodingSFX)(context);
+        if (functions_1.isWhileCodingSFX) {
             vscode.window.showInformationMessage("SFX toggled on");
         }
-        if (!functions_1.whileCodingSFX) {
+        if (!functions_1.isWhileCodingSFX) {
             vscode.window.showInformationMessage("SFX toggled off");
         }
     });
     // register the Tree Data Provider
-    const commandButtonsProvider = new classes_1.CommandButtons();
+    const commandButtonsProvider = new classes_1.CommandButtonsProvider();
     vscode.window.createTreeView("codesfx", {
         treeDataProvider: commandButtonsProvider,
     });

@@ -26,16 +26,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.diagnosticListener = exports.whileCodingSFX = void 0;
+exports.diagnosticListener = exports.isWhileCodingSFX = void 0;
 exports.toggleWhileCodingSFX = toggleWhileCodingSFX;
 exports.playSFX = playSFX;
 exports.getTerminalOutput = getTerminalOutput;
-exports.updateDiagnosticsListener = updateDiagnosticsListener;
+exports.whileCodingSFX = whileCodingSFX;
 const path_1 = __importDefault(require("path"));
 const sound_play_1 = __importDefault(require("sound-play"));
 const vscode = __importStar(require("vscode"));
 // function variables
-exports.whileCodingSFX = true;
+exports.isWhileCodingSFX = true;
 // vscode severity codes for different diagnostics
 const err = 0;
 const warn = 1;
@@ -46,7 +46,7 @@ const hint = 3;
  * Toggles "while coding" sfx feature
  */
 function toggleWhileCodingSFX() {
-    exports.whileCodingSFX = !exports.whileCodingSFX;
+    exports.isWhileCodingSFX = !exports.isWhileCodingSFX;
 }
 // incomplete. the goal is to make a mutable SFX function
 function playSFX(context, soundName) {
@@ -71,8 +71,8 @@ async function getTerminalOutput(context) {
     const output = await vscode.env.clipboard.readText();
     //console.log(output);
     //const cleanOutput: string = output.trim();
-    //pastes saved data back into terminal
     //console.log(cleanOutput);
+    //pastes saved data back into terminal
     //vscode.window.activeTerminal?.sendText(cleanOutput, false);
     if (output.includes("Error")) {
         const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
@@ -89,12 +89,12 @@ async function getTerminalOutput(context) {
  * Updates diagnostic listener and handles the "while coding" SFX feature
  * @param context - file context
  */
-function updateDiagnosticsListener(context) {
+function whileCodingSFX(context) {
     if (exports.diagnosticListener) {
         exports.diagnosticListener.dispose();
         exports.diagnosticListener = undefined;
     }
-    if (exports.whileCodingSFX) {
+    if (exports.isWhileCodingSFX) {
         // listens for diagnostics while coding; triggers sounds accordingly
         exports.diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
             const diagnostics = vscode.languages.getDiagnostics();

@@ -11,7 +11,7 @@ import {
 export function activate(context: vscode.ExtensionContext) {
   console.log("CodeSFX is now active!");
 
-  // sets up listener for "while coding" SFX feature
+  // readies "while coding" SFX feature
   whileCodingSFX(context);
 
   // command disposables
@@ -27,7 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (isWhileCodingSFX) {
         vscode.window.showInformationMessage("SFX toggled on");
       }
-      if (!whileCodingSFX) {
+      if (!isWhileCodingSFX) {
         vscode.window.showInformationMessage("SFX toggled off");
       }
     });

@@ -16,7 +16,7 @@ const hint = 3;
  * Toggles "while coding" sfx feature
  */
 export function toggleWhileCodingSFX() {
-  isWhileCodingSFX = !whileCodingSFX;
+  isWhileCodingSFX = !isWhileCodingSFX;
 }
 
 // incomplete. the goal is to make a mutable SFX function

@@ -1,28 +1,31 @@
 import * as vscode from "vscode";
 
-//class definitions
 /**
- * Defines tree view of command buttons for CodeSFX
+ * Defines tree view of CodeSFX command buttons
  */
-export class CommandButtons implements vscode.TreeDataProvider<Button> {
+export class CommandButtonsProvider
+  implements vscode.TreeDataProvider<CommandButton>
+{
   constructor() {}
-  onDidChangeTreeData?:
-    | vscode.Event<void | Button | Button[] | null | undefined>
-    | undefined;
-  getTreeItem(element: Button): vscode.TreeItem | Thenable<vscode.TreeItem> {
+
+  getTreeItem(
+    element: CommandButton
+  ): vscode.TreeItem | Thenable<vscode.TreeItem> {
     return element;
   }
-  getChildren(element: Button | undefined): vscode.ProviderResult<Button[]> {
-    const activeLanguage: string | undefined =
+  getChildren(
+    element: CommandButton | undefined
+  ): vscode.ProviderResult<CommandButton[]> {
+    const activeLanguage: string | undefined = //for use later... maybe
       vscode.window.activeTextEditor?.document.languageId;
     return [
-      new Button(
+      new CommandButton(
         "Get Terminal Output",
         "codesfx.getTerminalOutput",
         "Grabs terminal output and plays sound effects",
         new vscode.ThemeIcon("debug-start")
       ),
-      new Button(
+      new CommandButton(
         "Toggle SFX",
         "codesfx.toggleWhileCodingSFX",
         "Toggles SFX that play while coding",
@@ -33,16 +36,16 @@ export class CommandButtons implements vscode.TreeDataProvider<Button> {
 }
 
 /**
- * Defines command buttons
+ * Defines buttons for CodeSFX commands
  */
-class Button extends vscode.TreeItem {
+class CommandButton extends vscode.TreeItem {
   constructor(
     label: string,
     commandId: string,
     tooltip?: string,
     icon?: vscode.ThemeIcon
   ) {
-    super(label, vscode.TreeItemCollapsibleState.None);
+    super(label);
     this.command = {
       command: commandId,
       title: label,

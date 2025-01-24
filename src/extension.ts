@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CommandButtons } from "./classes";
+import { CommandButtonsProvider } from "./classes";
 import {
   getTerminalOutput,
   toggleWhileCodingSFX,
@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
   // register the Tree Data Provider
-  const commandButtonsProvider = new CommandButtons();
+  const commandButtonsProvider = new CommandButtonsProvider();
   vscode.window.createTreeView("codesfx", {
     treeDataProvider: commandButtonsProvider,
   });

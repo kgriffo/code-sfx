@@ -3,7 +3,7 @@ import sound from "sound-play";
 import * as vscode from "vscode";
 
 // function variables
-export let whileCodingSFX: boolean = true;
+export let isWhileCodingSFX: boolean = true;
 export let diagnosticListener: vscode.Disposable | undefined;
 // vscode severity codes for different diagnostics
 const err = 0;
@@ -16,7 +16,7 @@ const hint = 3;
  * Toggles "while coding" sfx feature
  */
 export function toggleWhileCodingSFX() {
-  whileCodingSFX = !whileCodingSFX;
+  isWhileCodingSFX = !whileCodingSFX;
 }
 
 // incomplete. the goal is to make a mutable SFX function
@@ -31,50 +31,54 @@ export function playSFX(context: vscode.ExtensionContext, soundName: string) {
  * Grabs terminal output and plays sfx accordingly
  * @param context - file context
  */
-export function getTerminalOutput(context: vscode.ExtensionContext) {
-  vscode.commands
-    .executeCommand("workbench.action.terminal.selectAll")
-    .then(() => {
-      vscode.commands
-        .executeCommand("workbench.action.terminal.copySelection")
-        .then(async () => {
-          let output: Thenable<string> = vscode.env.clipboard.readText();
-          if ((await output).includes("Error")) {
-            const filePath: string = path.join(
-              context.extensionPath,
-              "sfx",
-              "doorbell.mp3"
-            );
-            sound.play(filePath);
-            vscode.commands.executeCommand(
-              "workbench.action.terminal.clearSelection"
-            );
-          } else {
-            const filePath: string = path.join(
-              context.extensionPath,
-              "sfx",
-              "iphone-chime.mp3"
-            );
-            sound.play(filePath);
-          }
-          vscode.commands.executeCommand(
-            "workbench.action.terminal.clearSelection"
-          );
-        });
-    });
+export async function getTerminalOutput(context: vscode.ExtensionContext) {
+  //clears terminal
+  vscode.commands.executeCommand("workbench.action.terminal.clear");
+  //run program here
+  //selects terminal data
+  await vscode.commands.executeCommand("workbench.action.terminal.selectAll");
+  //copies terminal data
+  await vscode.commands.executeCommand(
+    "workbench.action.terminal.copySelection"
+  );
+  //saves terminal data
+  const output: string = await vscode.env.clipboard.readText();
+  //console.log(output);
+  //const cleanOutput: string = output.trim();
+  //console.log(cleanOutput);
+  //pastes saved data back into terminal
+  //vscode.window.activeTerminal?.sendText(cleanOutput, false);
+
+  if (output.includes("Error")) {
+    const filePath: string = path.join(
+      context.extensionPath,
+      "sfx",
+      "doorbell.mp3"
+    );
+    sound.play(filePath);
+    vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
+  } else {
+    const filePath: string = path.join(
+      context.extensionPath,
+      "sfx",
+      "iphone-chime.mp3"
+    );
+    sound.play(filePath);
+  }
+  vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
 }
 
 /**
  * Updates diagnostic listener and handles the "while coding" SFX feature
  * @param context - file context
  */
-export function updateDiagnosticsListener(context: vscode.ExtensionContext) {
+export function whileCodingSFX(context: vscode.ExtensionContext) {
   if (diagnosticListener) {
     diagnosticListener.dispose();
     diagnosticListener = undefined;
   }
 
-  if (whileCodingSFX) {
+  if (isWhileCodingSFX) {
     // listens for diagnostics while coding; triggers sounds accordingly
     diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
       const diagnostics: [vscode.Uri, vscode.Diagnostic[]][] =

@@ -3,8 +3,8 @@ import { CommandButtons } from "./classes";
 import {
   getTerminalOutput,
   toggleWhileCodingSFX,
-  updateDiagnosticsListener,
   whileCodingSFX,
+  isWhileCodingSFX,
 } from "./functions";
 
 // activation function
@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
   console.log("CodeSFX is now active!");
 
   // sets up listener for "while coding" SFX feature
-  updateDiagnosticsListener(context);
+  whileCodingSFX(context);
 
   // command disposables
   let getTerminalOutputDisp: vscode.Disposable =
@@ -23,8 +23,8 @@ export function activate(context: vscode.ExtensionContext) {
   let toggleWhileCodingSFXDisp: vscode.Disposable =
     vscode.commands.registerCommand("codesfx.toggleWhileCodingSFX", () => {
       toggleWhileCodingSFX();
-      updateDiagnosticsListener(context);
-      if (whileCodingSFX) {
+      whileCodingSFX(context);
+      if (isWhileCodingSFX) {
         vscode.window.showInformationMessage("SFX toggled on");
       }
       if (!whileCodingSFX) {

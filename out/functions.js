@@ -31,9 +31,9 @@ exports.toggleWhileCodingSFX = toggleWhileCodingSFX;
 exports.playSFX = playSFX;
 exports.getTerminalOutput = getTerminalOutput;
 exports.updateDiagnosticsListener = updateDiagnosticsListener;
-const vscode = __importStar(require("vscode"));
-const sound_play_1 = __importDefault(require("sound-play"));
 const path_1 = __importDefault(require("path"));
+const sound_play_1 = __importDefault(require("sound-play"));
+const vscode = __importStar(require("vscode"));
 // function variables
 exports.whileCodingSFX = true;
 // vscode severity codes for different diagnostics
@@ -59,26 +59,31 @@ function playSFX(context, soundName) {
  * Grabs terminal output and plays sfx accordingly
  * @param context - file context
  */
-function getTerminalOutput(context) {
-    vscode.commands
-        .executeCommand("workbench.action.terminal.selectAll")
-        .then(() => {
-        vscode.commands
-            .executeCommand("workbench.action.terminal.copySelection")
-            .then(async () => {
-            let output = vscode.env.clipboard.readText();
-            if ((await output).includes("Error")) {
-                const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
-                sound_play_1.default.play(filePath);
-                vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
-            }
-            else {
-                const filePath = path_1.default.join(context.extensionPath, "sfx", "iphone-chime.mp3");
-                sound_play_1.default.play(filePath);
-            }
-            vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
-        });
-    });
+async function getTerminalOutput(context) {
+    //clears terminal
+    vscode.commands.executeCommand("workbench.action.terminal.clear");
+    //run program here
+    //selects terminal data
+    await vscode.commands.executeCommand("workbench.action.terminal.selectAll");
+    //copies terminal data
+    await vscode.commands.executeCommand("workbench.action.terminal.copySelection");
+    //saves terminal data
+    const output = await vscode.env.clipboard.readText();
+    //console.log(output);
+    //const cleanOutput: string = output.trim();
+    //pastes saved data back into terminal
+    //console.log(cleanOutput);
+    //vscode.window.activeTerminal?.sendText(cleanOutput, false);
+    if (output.includes("Error")) {
+        const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
+        sound_play_1.default.play(filePath);
+        vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
+    }
+    else {
+        const filePath = path_1.default.join(context.extensionPath, "sfx", "iphone-chime.mp3");
+        sound_play_1.default.play(filePath);
+    }
+    vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
 }
 /**
  * Updates diagnostic listener and handles the "while coding" SFX feature

@@ -20,9 +20,9 @@ export class CommandButtonsProvider
       vscode.window.activeTextEditor?.document.languageId;
     return [
       new CommandButton(
-        "Get Terminal Output",
-        "codesfx.getTerminalOutput",
-        "Grabs terminal output and plays sound effects",
+        "Run with CodeSFX",
+        "codesfx.runWithCodeSFX",
+        "Runs active file with CodeSFX",
         new vscode.ThemeIcon("debug-start")
       ),
       new CommandButton(

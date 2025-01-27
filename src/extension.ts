@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { CommandButtonsProvider } from "./classes";
 import {
-  getTerminalOutput,
+  runWithCodeSFX,
   toggleWhileCodingSFX,
   whileCodingSFX,
   isWhileCodingSFX,
@@ -15,10 +15,12 @@ export function activate(context: vscode.ExtensionContext) {
   whileCodingSFX(context);
 
   // command disposables
-  let getTerminalOutputDisp: vscode.Disposable =
-    vscode.commands.registerCommand("codesfx.getTerminalOutput", () => {
-      getTerminalOutput(context);
-    });
+  let runWithCodeSFXDisp: vscode.Disposable = vscode.commands.registerCommand(
+    "codesfx.runWithCodeSFX",
+    () => {
+      runWithCodeSFX(context);
+    }
+  );
 
   let toggleWhileCodingSFXDisp: vscode.Disposable =
     vscode.commands.registerCommand("codesfx.toggleWhileCodingSFX", () => {
@@ -37,6 +39,6 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.window.createTreeView("codesfx", {
     treeDataProvider: commandButtonsProvider,
   });
-  context.subscriptions.push(getTerminalOutputDisp, toggleWhileCodingSFXDisp);
+  context.subscriptions.push(runWithCodeSFXDisp, toggleWhileCodingSFXDisp);
 }
 export function deactivate() {}

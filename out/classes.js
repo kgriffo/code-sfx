@@ -37,7 +37,7 @@ class CommandButtonsProvider {
         const activeLanguage = //for use later... maybe
          vscode.window.activeTextEditor?.document.languageId;
         return [
-            new CommandButton("Get Terminal Output", "codesfx.getTerminalOutput", "Grabs terminal output and plays sound effects", new vscode.ThemeIcon("debug-start")),
+            new CommandButton("Run with CodeSFX", "codesfx.runWithCodeSFX", "Runs active file with CodeSFX", new vscode.ThemeIcon("debug-start")),
             new CommandButton("Toggle SFX", "codesfx.toggleWhileCodingSFX", "Toggles SFX that play while coding", new vscode.ThemeIcon("debug-stop")),
         ];
     }

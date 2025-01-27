@@ -34,8 +34,8 @@ function activate(context) {
     // readies "while coding" SFX feature
     (0, functions_1.whileCodingSFX)(context);
     // command disposables
-    let getTerminalOutputDisp = vscode.commands.registerCommand("codesfx.getTerminalOutput", () => {
-        (0, functions_1.getTerminalOutput)(context);
+    let runWithCodeSFXDisp = vscode.commands.registerCommand("codesfx.runWithCodeSFX", () => {
+        (0, functions_1.runWithCodeSFX)(context);
     });
     let toggleWhileCodingSFXDisp = vscode.commands.registerCommand("codesfx.toggleWhileCodingSFX", () => {
         (0, functions_1.toggleWhileCodingSFX)();
@@ -52,7 +52,7 @@ function activate(context) {
     vscode.window.createTreeView("codesfx", {
         treeDataProvider: commandButtonsProvider,
     });
-    context.subscriptions.push(getTerminalOutputDisp, toggleWhileCodingSFXDisp);
+    context.subscriptions.push(runWithCodeSFXDisp, toggleWhileCodingSFXDisp);
 }
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

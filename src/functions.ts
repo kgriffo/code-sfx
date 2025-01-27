@@ -1,6 +1,5 @@
 import path from "path";
 import sound from "sound-play";
-import { spawn } from "child_process";
 import * as vscode from "vscode";
 
 // function variables

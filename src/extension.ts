@@ -41,4 +41,5 @@ export function activate(context: vscode.ExtensionContext) {
   });
   context.subscriptions.push(runWithCodeSFXDisp, toggleWhileCodingSFXDisp);
 }
+// deactivation function
 export function deactivate() {}

@@ -33,27 +33,41 @@ export function toggleWhileCodingSFX() {
  * @param context - file context
  */
 export async function runWithCodeSFX(context: vscode.ExtensionContext) {
-  //clears terminal
+  // clears terminal
   vscode.commands.executeCommand("workbench.action.terminal.clear");
-  //run program (only python right now)
+  // gathers file information
   if (vscode.window.activeTextEditor) {
     const scriptPath: string | undefined =
       vscode.window.activeTextEditor?.document.fileName;
+    const scriptLanguage: string | undefined =
+      vscode.window.activeTextEditor?.document.languageId;
     console.log(scriptPath);
-    //runs active file
-    vscode.window.activeTerminal?.sendText(`python3 ${scriptPath}`);
-    //wait (band-aid solution)
+    console.log(scriptLanguage);
+    if (!vscode.window.activeTerminal) {
+      const terminal = vscode.window.createTerminal();
+      terminal.show();
+    } else {
+      vscode.window.activeTerminal.show();
+    }
+    // runs active file
+    if (scriptLanguage === "python") {
+      vscode.window.activeTerminal?.sendText(`python3 ${scriptPath}`);
+    }
+    if (scriptLanguage === "java") {
+      vscode.window.activeTerminal?.sendText(`java ${scriptPath}`);
+    }
+    // wait (band-aid solution - switch to interval(?) later)
     await new Promise((resolve) => setTimeout(resolve, 100));
-    //selects terminal data
+    // selects terminal data
     await vscode.commands.executeCommand("workbench.action.terminal.selectAll");
-    //copies terminal data
+    // copies terminal data
     await vscode.commands.executeCommand(
       "workbench.action.terminal.copySelection"
     );
-    //saves terminal data
+    // saves terminal data
     const output: string = await vscode.env.clipboard.readText();
 
-    if (output.includes("Error")) {
+    if (output.includes("Error") || output.includes("Exception")) {
       const filePath: string = path.join(
         context.extensionPath,
         "sfx",

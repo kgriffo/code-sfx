@@ -61,23 +61,37 @@ function toggleWhileCodingSFX() {
  * @param context - file context
  */
 async function runWithCodeSFX(context) {
-    //clears terminal
+    // clears terminal
     vscode.commands.executeCommand("workbench.action.terminal.clear");
-    //run program (only python right now)
+    // gathers file information
     if (vscode.window.activeTextEditor) {
         const scriptPath = vscode.window.activeTextEditor?.document.fileName;
+        const scriptLanguage = vscode.window.activeTextEditor?.document.languageId;
         console.log(scriptPath);
-        //runs active file
-        vscode.window.activeTerminal?.sendText(`python3 ${scriptPath}`);
-        //wait (band-aid solution)
+        console.log(scriptLanguage);
+        if (!vscode.window.activeTerminal) {
+            const terminal = vscode.window.createTerminal();
+            terminal.show();
+        }
+        else {
+            vscode.window.activeTerminal.show();
+        }
+        // runs active file
+        if (scriptLanguage === "python") {
+            vscode.window.activeTerminal?.sendText(`python3 ${scriptPath}`);
+        }
+        if (scriptLanguage === "java") {
+            vscode.window.activeTerminal?.sendText(`java ${scriptPath}`);
+        }
+        // wait (band-aid solution - switch to interval(?) later)
         await new Promise((resolve) => setTimeout(resolve, 100));
-        //selects terminal data
+        // selects terminal data
         await vscode.commands.executeCommand("workbench.action.terminal.selectAll");
-        //copies terminal data
+        // copies terminal data
         await vscode.commands.executeCommand("workbench.action.terminal.copySelection");
-        //saves terminal data
+        // saves terminal data
         const output = await vscode.env.clipboard.readText();
-        if (output.includes("Error")) {
+        if (output.includes("Error") || output.includes("Exception")) {
             const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
             sound_play_1.default.play(filePath);
             vscode.commands.executeCommand("workbench.action.terminal.clearSelection");

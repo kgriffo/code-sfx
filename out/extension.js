@@ -54,5 +54,6 @@ function activate(context) {
     });
     context.subscriptions.push(runWithCodeSFXDisp, toggleWhileCodingSFXDisp);
 }
+// deactivation function
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

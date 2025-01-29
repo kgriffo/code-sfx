@@ -44,7 +44,6 @@ const hint = 3;
 // functions
 // incomplete. the goal is to make a mutable SFX function
 function playSFX(context, soundName) {
-    soundName = "";
     let sfxFolder = "sfx";
     const filePath = path_1.default.join(context.extensionPath, sfxFolder, soundName);
     sound_play_1.default.play(filePath);
@@ -63,12 +62,24 @@ function toggleWhileCodingSFX() {
 async function runWithCodeSFX(context) {
     // clears terminal
     vscode.commands.executeCommand("workbench.action.terminal.clear");
+    // selects terminal data
+    await vscode.commands.executeCommand("workbench.action.terminal.selectAll");
+    // copies terminal data
+    await vscode.commands.executeCommand("workbench.action.terminal.copySelection");
+    // saves terminal command prompt
+    let termPrompt = await vscode.env.clipboard.readText();
+    console.log("Before substring: " + termPrompt);
+    const endOfPrompt = termPrompt.search("%");
+    termPrompt = termPrompt.substring(0, endOfPrompt);
+    console.log("After substring: " + termPrompt);
+    const promptLength = termPrompt.length;
+    console.log("Prompt Length: " + promptLength);
     // gathers file information
     if (vscode.window.activeTextEditor) {
         const scriptPath = vscode.window.activeTextEditor?.document.fileName;
         const scriptLanguage = vscode.window.activeTextEditor?.document.languageId;
-        console.log(scriptPath);
-        console.log(scriptLanguage);
+        console.log("Script path: " + scriptPath);
+        console.log("Script language: " + scriptLanguage);
         if (!vscode.window.activeTerminal) {
             const terminal = vscode.window.createTerminal();
             terminal.show();
@@ -79,28 +90,37 @@ async function runWithCodeSFX(context) {
         // runs active file
         if (scriptLanguage === "python") {
             vscode.window.activeTerminal?.sendText(`python3 ${scriptPath}`);
+            console.log("Python script ran");
         }
         if (scriptLanguage === "java") {
             vscode.window.activeTerminal?.sendText(`java ${scriptPath}`);
+            console.log("Java script ran");
         }
-        // wait (band-aid solution - switch to interval(?) later)
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        // selects terminal data
-        await vscode.commands.executeCommand("workbench.action.terminal.selectAll");
-        // copies terminal data
-        await vscode.commands.executeCommand("workbench.action.terminal.copySelection");
-        // saves terminal data
-        const output = await vscode.env.clipboard.readText();
-        if (output.includes("Error") || output.includes("Exception")) {
-            const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
-            sound_play_1.default.play(filePath);
-            vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
-        }
-        else {
-            const filePath = path_1.default.join(context.extensionPath, "sfx", "iphone-chime.mp3");
-            sound_play_1.default.play(filePath);
-            vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
-        }
+        // check if prompt appears again, signalling script completion
+        const interval = setInterval(async () => {
+            // selects terminal data
+            vscode.commands.executeCommand("workbench.action.terminal.selectAll");
+            // copies terminal data
+            vscode.commands.executeCommand("workbench.action.terminal.copySelection");
+            // saves terminal data
+            let output = await vscode.env.clipboard.readText();
+            if (output.includes(termPrompt, promptLength)) {
+                clearInterval(interval);
+                console.log("Script completed");
+                if (output.includes("Error") || output.includes("Exception")) {
+                    const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
+                    sound_play_1.default.play(filePath);
+                    console.log("Sound played!");
+                }
+                else {
+                    const filePath = path_1.default.join(context.extensionPath, "sfx", "iphone-chime.mp3");
+                    sound_play_1.default.play(filePath);
+                    console.log("Sound played!");
+                }
+            }
+        }, 500);
+        // clears selection
+        vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
     }
     else {
         vscode.window.showErrorMessage("Command unavailable - no active file.");

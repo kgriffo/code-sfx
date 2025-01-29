@@ -1,9 +1,11 @@
 import * as vscode from "vscode";
 import { CommandButtonsProvider } from "./classes";
 import {
+  //functions
   runWithCodeSFX,
   toggleWhileCodingSFX,
   whileCodingSFX,
+  //variables
   isWhileCodingSFX,
 } from "./functions";
 

@@ -33,9 +33,7 @@ class CommandButtonsProvider {
     getTreeItem(element) {
         return element;
     }
-    getChildren(element) {
-        const activeLanguage = //for use later... maybe
-         vscode.window.activeTextEditor?.document.languageId;
+    getChildren() {
         return [
             new CommandButton("Run with CodeSFX", "codesfx.runWithCodeSFX", "Runs active file with CodeSFX", new vscode.ThemeIcon("debug-start")),
             new CommandButton("Toggle SFX", "codesfx.toggleWhileCodingSFX", "Toggles SFX that play while coding", new vscode.ThemeIcon("debug-stop")),

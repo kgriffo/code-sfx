@@ -54,6 +54,11 @@ function activate(context) {
     });
     context.subscriptions.push(runWithCodeSFXDisp, toggleWhileCodingSFXDisp);
 }
-// deactivation function
+// deactivation events \\
+// reverts highlight to default blue color
+vscode.workspace
+    .getConfiguration()
+    .update("workbench.colorCustomizations", { "terminal.selectionBackground": "#00000000" }, vscode.ConfigurationTarget.Global);
+//deactivates extension
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

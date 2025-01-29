@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 import { CommandButtonsProvider } from "./classes";
 import {
-  //functions
+  //functions \\
   runWithCodeSFX,
   toggleWhileCodingSFX,
   whileCodingSFX,
-  //variables
+  //variables \\
   isWhileCodingSFX,
 } from "./functions";
 
@@ -43,5 +43,14 @@ export function activate(context: vscode.ExtensionContext) {
   });
   context.subscriptions.push(runWithCodeSFXDisp, toggleWhileCodingSFXDisp);
 }
-// deactivation function
+// deactivation events \\
+// reverts highlight to default blue color
+vscode.workspace
+  .getConfiguration()
+  .update(
+    "workbench.colorCustomizations",
+    { "terminal.selectionBackground": "#00000000" },
+    vscode.ConfigurationTarget.Global
+  );
+//deactivates extension
 export function deactivate() {}

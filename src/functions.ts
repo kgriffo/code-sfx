@@ -2,16 +2,16 @@ import path from "path";
 import sound from "sound-play";
 import * as vscode from "vscode";
 
-// function variables
+// function variables \\
 export let isWhileCodingSFX: boolean = true;
 export let diagnosticListener: vscode.Disposable | undefined;
-// vscode severity codes for different diagnostics
+// vscode severity codes for different diagnostics \\
 const err = 0;
 const warn = 1;
 const info = 2;
 const hint = 3;
 
-// functions
+// functions \\
 // incomplete. the goal is to make a mutable SFX function
 export function playSFX(context: vscode.ExtensionContext, soundName: string) {
   let sfxFolder: string = "sfx";
@@ -29,9 +29,16 @@ export function toggleWhileCodingSFX() {
 
 /**
  * Runs active file with CodeSFX, grabs terminal output and plays sfx accordingly
- * @param context - file context
+ * @param context - extension context
  */
 export async function runWithCodeSFX(context: vscode.ExtensionContext) {
+  vscode.workspace
+    .getConfiguration()
+    .update(
+      "workbench.colorCustomizations",
+      { "terminal.selectionBackground": "#00000000" },
+      vscode.ConfigurationTarget.Global
+    );
   // clears terminal
   vscode.commands.executeCommand("workbench.action.terminal.clear");
   // selects terminal data
@@ -111,7 +118,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
 
 /**
  * Handles the "while coding" SFX feature
- * @param context - file context
+ * @param context - extension context
  */
 export function whileCodingSFX(context: vscode.ExtensionContext) {
   if (diagnosticListener) {

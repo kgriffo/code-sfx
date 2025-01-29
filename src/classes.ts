@@ -13,11 +13,7 @@ export class CommandButtonsProvider
   ): vscode.TreeItem | Thenable<vscode.TreeItem> {
     return element;
   }
-  getChildren(
-    element: CommandButton | undefined
-  ): vscode.ProviderResult<CommandButton[]> {
-    const activeLanguage: string | undefined = //for use later... maybe
-      vscode.window.activeTextEditor?.document.languageId;
+  getChildren(): vscode.ProviderResult<CommandButton[]> {
     return [
       new CommandButton(
         "Run with CodeSFX",

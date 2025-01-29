@@ -60,6 +60,7 @@ function toggleWhileCodingSFX() {
  * @param context - extension context
  */
 async function runWithCodeSFX(context) {
+    // changes selection color to transparent to prevent visual annoyances
     vscode.workspace
         .getConfiguration()
         .update("workbench.colorCustomizations", { "terminal.selectionBackground": "#00000000" }, vscode.ConfigurationTarget.Global);
@@ -122,12 +123,15 @@ async function runWithCodeSFX(context) {
                 }
             }
         }, 500);
-        // clears selection
-        vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
     }
     else {
         vscode.window.showErrorMessage("Command unavailable - no active file.");
     }
+    // clears selection
+    vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
+    // reverts highlight to default blue color
+    vscode.workspace.getConfiguration().update("workbench.colorCustomizations", { "terminal.selectionBackground": "#00000000" }, //change to default color
+    vscode.ConfigurationTarget.Global);
 }
 /**
  * Handles the "while coding" SFX feature

@@ -32,6 +32,7 @@ export function toggleWhileCodingSFX() {
  * @param context - extension context
  */
 export async function runWithCodeSFX(context: vscode.ExtensionContext) {
+  // changes selection color to transparent to prevent visual annoyances
   vscode.workspace
     .getConfiguration()
     .update(
@@ -109,11 +110,17 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
         }
       }
     }, 500);
-    // clears selection
-    vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
   } else {
     vscode.window.showErrorMessage("Command unavailable - no active file.");
   }
+  // clears selection
+  vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
+  // reverts highlight to default blue color
+  vscode.workspace.getConfiguration().update(
+    "workbench.colorCustomizations",
+    { "terminal.selectionBackground": "#00000000" }, //change to default color
+    vscode.ConfigurationTarget.Global
+  );
 }
 
 /**

@@ -130,8 +130,11 @@ async function runWithCodeSFX(context) {
     // clears selection
     vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
     // reverts highlight to default blue color
-    vscode.workspace.getConfiguration().update("workbench.colorCustomizations", { "terminal.selectionBackground": "#00000000" }, //change to default color
-    vscode.ConfigurationTarget.Global);
+    // vscode.workspace.getConfiguration().update(
+    //   "workbench.colorCustomizations",
+    //   { "terminal.selectionBackground": "#00000000" }, //change to default color
+    //   vscode.ConfigurationTarget.Global
+    // );
 }
 /**
  * Handles the "while coding" SFX feature

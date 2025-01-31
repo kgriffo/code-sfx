@@ -99,6 +99,18 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
           );
           sound.play(filePath);
           console.log("Sound played!");
+          // reverts highlight to default color (not working right now)
+          vscode.workspace
+            .getConfiguration()
+            .update(
+              "workbench.colorCustomizations",
+              { "terminal.selectionBackground": "default" },
+              vscode.ConfigurationTarget.Global
+            );
+          // clears selection
+          vscode.commands.executeCommand(
+            "workbench.action.terminal.clearSelection"
+          );
         } else {
           const filePath: string = path.join(
             context.extensionPath,
@@ -107,20 +119,24 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
           );
           sound.play(filePath);
           console.log("Sound played!");
+          // reverts highlight to default color (not working right now)
+          vscode.workspace
+            .getConfiguration()
+            .update(
+              "workbench.colorCustomizations",
+              { "terminal.selectionBackground": "default" },
+              vscode.ConfigurationTarget.Global
+            );
+          // clears selection
+          vscode.commands.executeCommand(
+            "workbench.action.terminal.clearSelection"
+          );
         }
       }
     }, 500);
   } else {
     vscode.window.showErrorMessage("Command unavailable - no active file.");
   }
-  // clears selection
-  vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
-  // reverts highlight to default blue color
-  // vscode.workspace.getConfiguration().update(
-  //   "workbench.colorCustomizations",
-  //   { "terminal.selectionBackground": "#00000000" }, //change to default color
-  //   vscode.ConfigurationTarget.Global
-  // );
 }
 
 /**

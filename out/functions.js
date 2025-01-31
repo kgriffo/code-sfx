@@ -115,11 +115,23 @@ async function runWithCodeSFX(context) {
                     const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
                     sound_play_1.default.play(filePath);
                     console.log("Sound played!");
+                    // reverts highlight to default color (not working right now)
+                    vscode.workspace
+                        .getConfiguration()
+                        .update("workbench.colorCustomizations", { "terminal.selectionBackground": "default" }, vscode.ConfigurationTarget.Global);
+                    // clears selection
+                    vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
                 }
                 else {
                     const filePath = path_1.default.join(context.extensionPath, "sfx", "iphone-chime.mp3");
                     sound_play_1.default.play(filePath);
                     console.log("Sound played!");
+                    // reverts highlight to default color (not working right now)
+                    vscode.workspace
+                        .getConfiguration()
+                        .update("workbench.colorCustomizations", { "terminal.selectionBackground": "default" }, vscode.ConfigurationTarget.Global);
+                    // clears selection
+                    vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
                 }
             }
         }, 500);
@@ -127,14 +139,6 @@ async function runWithCodeSFX(context) {
     else {
         vscode.window.showErrorMessage("Command unavailable - no active file.");
     }
-    // clears selection
-    vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
-    // reverts highlight to default blue color
-    // vscode.workspace.getConfiguration().update(
-    //   "workbench.colorCustomizations",
-    //   { "terminal.selectionBackground": "#00000000" }, //change to default color
-    //   vscode.ConfigurationTarget.Global
-    // );
 }
 /**
  * Handles the "while coding" SFX feature

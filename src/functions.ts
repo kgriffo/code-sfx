@@ -99,7 +99,6 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
           );
           sound.play(filePath);
           console.log("Sound played!");
-          // reverts highlight to default color (not working right now)
           vscode.workspace
             .getConfiguration()
             .update(
@@ -119,7 +118,6 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
           );
           sound.play(filePath);
           console.log("Sound played!");
-          // reverts highlight to default color (not working right now)
           vscode.workspace
             .getConfiguration()
             .update(
@@ -144,6 +142,8 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
  * @param context - extension context
  */
 export function whileCodingSFX(context: vscode.ExtensionContext) {
+  let handledDiags = new Set<string>();
+
   if (diagnosticListener) {
     diagnosticListener.dispose();
     diagnosticListener = undefined;
@@ -154,30 +154,36 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
     diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
       const diagnostics: [vscode.Uri, vscode.Diagnostic[]][] =
         vscode.languages.getDiagnostics();
-      while (diagnostics.length > 0) {
-        let diag = diagnostics.pop();
-        if (diag !== undefined) {
-          let diagArray: vscode.Diagnostic[] = diag[1]; //array of diagnostics (diag[0] = uri)
-          diagArray.forEach((item: vscode.Diagnostic) => {
-            if (item.severity === err) {
-              const filePath: string = path.join(
-                context.extensionPath,
-                "sfx",
-                "notification-beep.mp3"
-              );
-              sound.play(filePath);
-            }
-            if (item.severity === warn) {
-              const filePath: string = path.join(
-                context.extensionPath,
-                "sfx",
-                "airplane-beep.mp3"
-              );
-              sound.play(filePath);
-            }
-          });
-        }
-      }
+
+      diagnostics.forEach(([, diagArray]) => {
+        diagArray.forEach((item: vscode.Diagnostic) => {
+          let diagID = `${item.severity}${item.range.start.line}${item.range.end.line}`;
+          console.log(diagID);
+
+          if (handledDiags.has(diagID)) {
+            return;
+          }
+
+          if (item.severity === err) {
+            const filePath: string = path.join(
+              context.extensionPath,
+              "sfx",
+              "notification-beep.mp3"
+            );
+            sound.play(filePath);
+          }
+
+          if (item.severity === warn) {
+            const filePath: string = path.join(
+              context.extensionPath,
+              "sfx",
+              "airplane-beep.mp3"
+            );
+            sound.play(filePath);
+          }
+          handledDiags.add(diagID);
+        });
+      });
     });
   }
 }

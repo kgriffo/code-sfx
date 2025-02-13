@@ -115,7 +115,6 @@ async function runWithCodeSFX(context) {
                     const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
                     sound_play_1.default.play(filePath);
                     console.log("Sound played!");
-                    // reverts highlight to default color (not working right now)
                     vscode.workspace
                         .getConfiguration()
                         .update("workbench.colorCustomizations", { "terminal.selectionBackground": "default" }, vscode.ConfigurationTarget.Global);
@@ -126,7 +125,6 @@ async function runWithCodeSFX(context) {
                     const filePath = path_1.default.join(context.extensionPath, "sfx", "iphone-chime.mp3");
                     sound_play_1.default.play(filePath);
                     console.log("Sound played!");
-                    // reverts highlight to default color (not working right now)
                     vscode.workspace
                         .getConfiguration()
                         .update("workbench.colorCustomizations", { "terminal.selectionBackground": "default" }, vscode.ConfigurationTarget.Global);
@@ -145,6 +143,7 @@ async function runWithCodeSFX(context) {
  * @param context - extension context
  */
 function whileCodingSFX(context) {
+    let handledDiags = new Set();
     if (exports.diagnosticListener) {
         exports.diagnosticListener.dispose();
         exports.diagnosticListener = undefined;
@@ -153,22 +152,24 @@ function whileCodingSFX(context) {
         // listens for diagnostics while coding; triggers sounds accordingly
         exports.diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
             const diagnostics = vscode.languages.getDiagnostics();
-            while (diagnostics.length > 0) {
-                let diag = diagnostics.pop();
-                if (diag !== undefined) {
-                    let diagArray = diag[1]; //array of diagnostics (diag[0] = uri)
-                    diagArray.forEach((item) => {
-                        if (item.severity === err) {
-                            const filePath = path_1.default.join(context.extensionPath, "sfx", "notification-beep.mp3");
-                            sound_play_1.default.play(filePath);
-                        }
-                        if (item.severity === warn) {
-                            const filePath = path_1.default.join(context.extensionPath, "sfx", "airplane-beep.mp3");
-                            sound_play_1.default.play(filePath);
-                        }
-                    });
-                }
-            }
+            diagnostics.forEach(([, diagArray]) => {
+                diagArray.forEach((item) => {
+                    let diagID = `${item.severity}${item.range.start.line}${item.range.end.line}`;
+                    console.log(diagID);
+                    if (handledDiags.has(diagID)) {
+                        return;
+                    }
+                    if (item.severity === err) {
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "notification-beep.mp3");
+                        sound_play_1.default.play(filePath);
+                    }
+                    if (item.severity === warn) {
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "airplane-beep.mp3");
+                        sound_play_1.default.play(filePath);
+                    }
+                    handledDiags.add(diagID);
+                });
+            });
         });
     }
 }

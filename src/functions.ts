@@ -28,6 +28,60 @@ export function toggleWhileCodingSFX() {
 }
 
 /**
+ * Handles the "while coding" SFX feature
+ * @param context - extension context
+ */
+export function whileCodingSFX(context: vscode.ExtensionContext) {
+  let handledDiags = new Set<string>();
+
+  // ensures diagnostic listener for whileCodingSFX is activated correctly
+  if (diagnosticListener) {
+    diagnosticListener.dispose();
+    diagnosticListener = undefined;
+  }
+
+  if (isWhileCodingSFX) {
+    // listens for diagnostics while coding; triggers sounds accordingly
+    diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
+      const diagnostics: [vscode.Uri, vscode.Diagnostic[]][] =
+        vscode.languages.getDiagnostics();
+
+      diagnostics.forEach(([, diagArray]) => {
+        diagArray.forEach((item: vscode.Diagnostic) => {
+          let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
+          console.log(diagID);
+
+          if (handledDiags.has(diagID)) {
+            return;
+          }
+
+          if (item.severity === err) {
+            const filePath: string = path.join(
+              context.extensionPath,
+              "sfx",
+              "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
+            );
+            sound.play(filePath);
+            console.log("(While coding) error sound played!");
+          }
+
+          if (item.severity === warn) {
+            const filePath: string = path.join(
+              context.extensionPath,
+              "sfx",
+              "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+            );
+            sound.play(filePath);
+            console.log("(While coding) warning sound played!");
+          }
+          handledDiags.add(diagID);
+        });
+      });
+    });
+  }
+}
+
+/**
  * Runs active file with CodeSFX, grabs terminal output and plays sfx accordingly
  * @param context - extension context
  */
@@ -177,57 +231,5 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
     }, 500);
   } else {
     vscode.window.showErrorMessage("Command unavailable - no active file.");
-  }
-}
-
-/**
- * Handles the "while coding" SFX feature
- * @param context - extension context
- */
-export function whileCodingSFX(context: vscode.ExtensionContext) {
-  let handledDiags = new Set<string>();
-
-  // ensures diagnostic listener for whileCodingSFX is activated correctly
-  if (diagnosticListener) {
-    diagnosticListener.dispose();
-    diagnosticListener = undefined;
-  }
-
-  if (isWhileCodingSFX) {
-    // listens for diagnostics while coding; triggers sounds accordingly
-    diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
-      const diagnostics: [vscode.Uri, vscode.Diagnostic[]][] =
-        vscode.languages.getDiagnostics();
-
-      diagnostics.forEach(([, diagArray]) => {
-        diagArray.forEach((item: vscode.Diagnostic) => {
-          let diagID = `${item.severity}${item.range.start.line}${item.range.end.line}`;
-          console.log(diagID);
-
-          if (handledDiags.has(diagID)) {
-            return;
-          }
-
-          if (item.severity === err) {
-            const filePath: string = path.join(
-              context.extensionPath,
-              "sfx",
-              "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
-            );
-            sound.play(filePath);
-          }
-
-          if (item.severity === warn) {
-            const filePath: string = path.join(
-              context.extensionPath,
-              "sfx",
-              "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
-            );
-            sound.play(filePath);
-          }
-          handledDiags.add(diagID);
-        });
-      });
-    });
   }
 }

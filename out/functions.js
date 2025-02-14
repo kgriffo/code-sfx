@@ -29,8 +29,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.diagnosticListener = exports.isWhileCodingSFX = void 0;
 exports.playSFX = playSFX;
 exports.toggleWhileCodingSFX = toggleWhileCodingSFX;
-exports.runWithCodeSFX = runWithCodeSFX;
 exports.whileCodingSFX = whileCodingSFX;
+exports.runWithCodeSFX = runWithCodeSFX;
 const path_1 = __importDefault(require("path"));
 const sound_play_1 = __importDefault(require("sound-play"));
 const vscode = __importStar(require("vscode"));
@@ -54,6 +54,44 @@ function playSFX(context, soundName) {
 function toggleWhileCodingSFX() {
     exports.isWhileCodingSFX = !exports.isWhileCodingSFX;
     console.log(`Toggled whileCodingSFX: ${exports.isWhileCodingSFX}`);
+}
+/**
+ * Handles the "while coding" SFX feature
+ * @param context - extension context
+ */
+function whileCodingSFX(context) {
+    let handledDiags = new Set();
+    // ensures diagnostic listener for whileCodingSFX is activated correctly
+    if (exports.diagnosticListener) {
+        exports.diagnosticListener.dispose();
+        exports.diagnosticListener = undefined;
+    }
+    if (exports.isWhileCodingSFX) {
+        // listens for diagnostics while coding; triggers sounds accordingly
+        exports.diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
+            const diagnostics = vscode.languages.getDiagnostics();
+            diagnostics.forEach(([, diagArray]) => {
+                diagArray.forEach((item) => {
+                    let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
+                    console.log(diagID);
+                    if (handledDiags.has(diagID)) {
+                        return;
+                    }
+                    if (item.severity === err) {
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
+                        sound_play_1.default.play(filePath);
+                        console.log("(While coding) error sound played!");
+                    }
+                    if (item.severity === warn) {
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                        sound_play_1.default.play(filePath);
+                        console.log("(While coding) warning sound played!");
+                    }
+                    handledDiags.add(diagID);
+                });
+            });
+        });
+    }
 }
 /**
  * Runs active file with CodeSFX, grabs terminal output and plays sfx accordingly
@@ -163,42 +201,6 @@ async function runWithCodeSFX(context) {
     }
     else {
         vscode.window.showErrorMessage("Command unavailable - no active file.");
-    }
-}
-/**
- * Handles the "while coding" SFX feature
- * @param context - extension context
- */
-function whileCodingSFX(context) {
-    let handledDiags = new Set();
-    // ensures diagnostic listener for whileCodingSFX is activated correctly
-    if (exports.diagnosticListener) {
-        exports.diagnosticListener.dispose();
-        exports.diagnosticListener = undefined;
-    }
-    if (exports.isWhileCodingSFX) {
-        // listens for diagnostics while coding; triggers sounds accordingly
-        exports.diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
-            const diagnostics = vscode.languages.getDiagnostics();
-            diagnostics.forEach(([, diagArray]) => {
-                diagArray.forEach((item) => {
-                    let diagID = `${item.severity}${item.range.start.line}${item.range.end.line}`;
-                    console.log(diagID);
-                    if (handledDiags.has(diagID)) {
-                        return;
-                    }
-                    if (item.severity === err) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
-                        sound_play_1.default.play(filePath);
-                    }
-                    if (item.severity === warn) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
-                        sound_play_1.default.play(filePath);
-                    }
-                    handledDiags.add(diagID);
-                });
-            });
-        });
     }
 }
 //# sourceMappingURL=functions.js.map

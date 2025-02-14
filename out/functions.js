@@ -60,6 +60,7 @@ function toggleWhileCodingSFX() {
  * @param context - extension context
  */
 async function runWithCodeSFX(context) {
+    let errorSoundPlayed = false;
     // changes selection color to transparent to prevent visual annoyances
     vscode.workspace
         .getConfiguration()
@@ -111,18 +112,44 @@ async function runWithCodeSFX(context) {
             if (output.includes(termPrompt, promptLength)) {
                 clearInterval(interval);
                 console.log("Script completed");
+                // error detected
                 if (output.includes("Error") || output.includes("Exception")) {
-                    const filePath = path_1.default.join(context.extensionPath, "sfx", "doorbell.mp3");
-                    sound_play_1.default.play(filePath);
-                    console.log("Sound played!");
+                    // divide by zero
+                    if (output.includes("ZeroDivisionError")) {
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(DivideByZero)G5(ish)_sawtooth_800hz_0.1s.wav");
+                        sound_play_1.default.play(filePath);
+                        errorSoundPlayed = true;
+                        console.log("Divide by zero sound played!");
+                    }
+                    // index error (out of bounds)
+                    if (output.includes("IndexError")) {
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(IndexError)B4(ish)_sawtooth_500hz_0.1s.wav");
+                        sound_play_1.default.play(filePath);
+                        errorSoundPlayed = true;
+                        console.log("Index error sound played!");
+                    }
+                    // type error
+                    if (output.includes("TypeError")) {
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(TypeError)D5(ish)_sawtooth_600hz_0.1s.wav");
+                        sound_play_1.default.play(filePath);
+                        errorSoundPlayed = true;
+                        console.log("Type error sound played!");
+                    }
+                    // general error
+                    if (!errorSoundPlayed) {
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
+                        sound_play_1.default.play(filePath);
+                        console.log("General error sound played!");
+                    }
                     vscode.workspace
                         .getConfiguration()
                         .update("workbench.colorCustomizations", { "terminal.selectionBackground": "default" }, vscode.ConfigurationTarget.Global);
                     // clears selection
                     vscode.commands.executeCommand("workbench.action.terminal.clearSelection");
+                    // no errors
                 }
                 else {
-                    const filePath = path_1.default.join(context.extensionPath, "sfx", "iphone-chime.mp3");
+                    const filePath = path_1.default.join(context.extensionPath, "sfx", "(no_errors)A5_sine_880hz_0.1s.wav");
                     sound_play_1.default.play(filePath);
                     console.log("Sound played!");
                     vscode.workspace
@@ -144,6 +171,7 @@ async function runWithCodeSFX(context) {
  */
 function whileCodingSFX(context) {
     let handledDiags = new Set();
+    // ensures diagnostic listener for whileCodingSFX is activated correctly
     if (exports.diagnosticListener) {
         exports.diagnosticListener.dispose();
         exports.diagnosticListener = undefined;
@@ -160,11 +188,11 @@ function whileCodingSFX(context) {
                         return;
                     }
                     if (item.severity === err) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "notification-beep.mp3");
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
                         sound_play_1.default.play(filePath);
                     }
                     if (item.severity === warn) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "airplane-beep.mp3");
+                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                         sound_play_1.default.play(filePath);
                     }
                     handledDiags.add(diagID);

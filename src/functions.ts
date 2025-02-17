@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 // function variables \\
 export let isWhileCodingSFX: boolean = true;
 export let diagnosticListener: vscode.Disposable | undefined;
+export let lineChangeListener: vscode.Disposable | undefined;
 // vscode severity codes for different diagnostics \\
 const err = 0;
 const warn = 1;
@@ -32,15 +33,29 @@ export function toggleWhileCodingSFX() {
  * @param context - extension context
  */
 export function whileCodingSFX(context: vscode.ExtensionContext) {
+  let allDiags = new Set<string>();
   let handledDiags = new Set<string>();
 
-  // ensures diagnostic listener for whileCodingSFX is activated correctly
+  // ensures diagnostic listener is activated correctly
   if (diagnosticListener) {
     diagnosticListener.dispose();
     diagnosticListener = undefined;
   }
+  // ensures line change listener is activated correctly
+  if (lineChangeListener) {
+    lineChangeListener.dispose();
+    lineChangeListener = undefined;
+  }
 
   if (isWhileCodingSFX) {
+    // listens for line changes while coding; used to determine whether or not errors have been resolved
+    lineChangeListener = vscode.window.onDidChangeTextEditorSelection(
+      (event) => {
+        // selections[0].active.line is the line the cursor is on (zero indexed)
+        let currentLine: number = event.selections[0].active.line + 1;
+        console.log(currentLine);
+      }
+    );
     // listens for diagnostics while coding; triggers sounds accordingly
     diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
       const diagnostics: [vscode.Uri, vscode.Diagnostic[]][] =
@@ -49,6 +64,7 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
       diagnostics.forEach(([, diagArray]) => {
         diagArray.forEach((item: vscode.Diagnostic) => {
           let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
+          allDiags.add(diagID);
           console.log(diagID);
 
           if (handledDiags.has(diagID)) {

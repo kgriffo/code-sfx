@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.diagnosticListener = exports.isWhileCodingSFX = void 0;
+exports.lineChangeListener = exports.diagnosticListener = exports.isWhileCodingSFX = void 0;
 exports.playSFX = playSFX;
 exports.toggleWhileCodingSFX = toggleWhileCodingSFX;
 exports.whileCodingSFX = whileCodingSFX;
@@ -60,19 +60,32 @@ function toggleWhileCodingSFX() {
  * @param context - extension context
  */
 function whileCodingSFX(context) {
+    let allDiags = new Set();
     let handledDiags = new Set();
-    // ensures diagnostic listener for whileCodingSFX is activated correctly
+    // ensures diagnostic listener is activated correctly
     if (exports.diagnosticListener) {
         exports.diagnosticListener.dispose();
         exports.diagnosticListener = undefined;
     }
+    // ensures line change listener is activated correctly
+    if (exports.lineChangeListener) {
+        exports.lineChangeListener.dispose();
+        exports.lineChangeListener = undefined;
+    }
     if (exports.isWhileCodingSFX) {
+        // listens for line changes while coding; used to determine whether or not errors have been resolved
+        exports.lineChangeListener = vscode.window.onDidChangeTextEditorSelection((event) => {
+            // selections[0].active.line is the line the cursor is on (zero indexed)
+            let currentLine = event.selections[0].active.line + 1;
+            console.log(currentLine);
+        });
         // listens for diagnostics while coding; triggers sounds accordingly
         exports.diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
             const diagnostics = vscode.languages.getDiagnostics();
             diagnostics.forEach(([, diagArray]) => {
                 diagArray.forEach((item) => {
                     let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
+                    allDiags.add(diagID);
                     console.log(diagID);
                     if (handledDiags.has(diagID)) {
                         return;

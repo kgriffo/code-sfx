@@ -63,6 +63,7 @@ function whileCodingSFX(context) {
     let allDiags = new Set();
     let handledDiags = new Set();
     let currentLine = vscode.window.activeTextEditor?.selection.active.line;
+    let resolvedErrors = [];
     // ensures diagnostic listener is activated correctly
     if (exports.diagnosticListener) {
         exports.diagnosticListener.dispose();
@@ -78,11 +79,13 @@ function whileCodingSFX(context) {
         exports.lineChangeListener = vscode.window.onDidChangeTextEditorSelection((event) => {
             // selections[0].active.line is the line the cursor is on (zero indexed)
             let newLine = event.selections[0].active.line;
+            // line changed
             if (newLine !== currentLine) {
                 handledDiags.forEach((diagID) => {
+                    // diagnostic handled and resolved
                     if (!allDiags.has(diagID)) {
                         console.log("deleting from handledDiags");
-                        handledDiags.delete(diagID);
+                        resolvedErrors.push();
                     }
                 });
             }
@@ -110,8 +113,21 @@ function whileCodingSFX(context) {
                         sound_play_1.default.play(filePath);
                         console.log("(While coding) warning sound played!");
                     }
+                    // add diagnostics to handled set after sound plays for it
                     handledDiags.add(diagID);
-                    allDiags.delete(diagID); //this isn't correct. but im pushing for now
+                    // update the handled set to remove resolved diagnostics
+                    for (let diagID of resolvedErrors) {
+                        handledDiags.delete(diagID);
+                    }
+                    // clear allDiags
+                    allDiags.clear();
+                    // repopulate allDiags with new diagnostics
+                    diagnostics.forEach(([, diagArray]) => {
+                        diagArray.forEach((item) => {
+                            let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
+                            allDiags.add(diagID);
+                        });
+                    });
                 });
             });
         });

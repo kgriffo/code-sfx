@@ -37,6 +37,7 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
   let handledDiags: Set<string> = new Set<string>();
   let currentLine: number | undefined =
     vscode.window.activeTextEditor?.selection.active.line;
+  let resolvedErrors: string[] = [];
 
   // ensures diagnostic listener is activated correctly
   if (diagnosticListener) {
@@ -55,11 +56,13 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
       (event) => {
         // selections[0].active.line is the line the cursor is on (zero indexed)
         let newLine: number = event.selections[0].active.line;
+        // line changed
         if (newLine !== currentLine) {
           handledDiags.forEach((diagID) => {
+            // diagnostic handled and resolved
             if (!allDiags.has(diagID)) {
               console.log("deleting from handledDiags");
-              handledDiags.delete(diagID);
+              resolvedErrors.push();
             }
           });
         }
@@ -101,8 +104,21 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
             sound.play(filePath);
             console.log("(While coding) warning sound played!");
           }
+          // add diagnostics to handled set after sound plays for it
           handledDiags.add(diagID);
-          allDiags.delete(diagID); //this isn't correct. but im pushing for now
+          // update the handled set to remove resolved diagnostics
+          for (let diagID of resolvedErrors) {
+            handledDiags.delete(diagID);
+          }
+          // clear allDiags
+          allDiags.clear();
+          // repopulate allDiags with new diagnostics
+          diagnostics.forEach(([, diagArray]) => {
+            diagArray.forEach((item: vscode.Diagnostic) => {
+              let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
+              allDiags.add(diagID);
+            });
+          });
         });
       });
     });

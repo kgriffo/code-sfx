@@ -62,6 +62,7 @@ function toggleWhileCodingSFX() {
 function whileCodingSFX(context) {
     let allDiags = new Set();
     let handledDiags = new Set();
+    let currentLine = vscode.window.activeTextEditor?.selection.active.line;
     // ensures diagnostic listener is activated correctly
     if (exports.diagnosticListener) {
         exports.diagnosticListener.dispose();
@@ -76,8 +77,16 @@ function whileCodingSFX(context) {
         // listens for line changes while coding; used to determine whether or not errors have been resolved
         exports.lineChangeListener = vscode.window.onDidChangeTextEditorSelection((event) => {
             // selections[0].active.line is the line the cursor is on (zero indexed)
-            let currentLine = event.selections[0].active.line + 1;
-            console.log(currentLine);
+            let newLine = event.selections[0].active.line;
+            if (newLine !== currentLine) {
+                handledDiags.forEach((diagID) => {
+                    if (!allDiags.has(diagID)) {
+                        console.log("deleting from handledDiags");
+                        handledDiags.delete(diagID);
+                    }
+                });
+            }
+            currentLine = newLine;
         });
         // listens for diagnostics while coding; triggers sounds accordingly
         exports.diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
@@ -86,21 +95,23 @@ function whileCodingSFX(context) {
                 diagArray.forEach((item) => {
                     let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
                     allDiags.add(diagID);
-                    console.log(diagID);
                     if (handledDiags.has(diagID)) {
                         return;
                     }
+                    // error
                     if (item.severity === err) {
                         const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
                         sound_play_1.default.play(filePath);
                         console.log("(While coding) error sound played!");
                     }
+                    // warning
                     if (item.severity === warn) {
                         const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                         sound_play_1.default.play(filePath);
                         console.log("(While coding) warning sound played!");
                     }
                     handledDiags.add(diagID);
+                    allDiags.delete(diagID); //this isn't correct. but im pushing for now
                 });
             });
         });

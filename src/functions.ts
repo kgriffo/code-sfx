@@ -33,8 +33,10 @@ export function toggleWhileCodingSFX() {
  * @param context - extension context
  */
 export function whileCodingSFX(context: vscode.ExtensionContext) {
-  let allDiags = new Set<string>();
-  let handledDiags = new Set<string>();
+  let allDiags: Set<string> = new Set<string>();
+  let handledDiags: Set<string> = new Set<string>();
+  let currentLine: number | undefined =
+    vscode.window.activeTextEditor?.selection.active.line;
 
   // ensures diagnostic listener is activated correctly
   if (diagnosticListener) {
@@ -52,8 +54,16 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
     lineChangeListener = vscode.window.onDidChangeTextEditorSelection(
       (event) => {
         // selections[0].active.line is the line the cursor is on (zero indexed)
-        let currentLine: number = event.selections[0].active.line + 1;
-        console.log(currentLine);
+        let newLine: number = event.selections[0].active.line;
+        if (newLine !== currentLine) {
+          handledDiags.forEach((diagID) => {
+            if (!allDiags.has(diagID)) {
+              console.log("deleting from handledDiags");
+              handledDiags.delete(diagID);
+            }
+          });
+        }
+        currentLine = newLine;
       }
     );
     // listens for diagnostics while coding; triggers sounds accordingly
@@ -65,12 +75,12 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
         diagArray.forEach((item: vscode.Diagnostic) => {
           let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
           allDiags.add(diagID);
-          console.log(diagID);
 
           if (handledDiags.has(diagID)) {
             return;
           }
 
+          // error
           if (item.severity === err) {
             const filePath: string = path.join(
               context.extensionPath,
@@ -81,6 +91,7 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
             console.log("(While coding) error sound played!");
           }
 
+          // warning
           if (item.severity === warn) {
             const filePath: string = path.join(
               context.extensionPath,
@@ -91,6 +102,7 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
             console.log("(While coding) warning sound played!");
           }
           handledDiags.add(diagID);
+          allDiags.delete(diagID); //this isn't correct. but im pushing for now
         });
       });
     });

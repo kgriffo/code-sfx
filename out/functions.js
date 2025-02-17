@@ -84,7 +84,7 @@ function whileCodingSFX(context) {
                 handledDiags.forEach((diagID) => {
                     // diagnostic handled and resolved
                     if (!allDiags.has(diagID)) {
-                        console.log("deleting from handledDiags");
+                        console.log("deleting from handledDiags: " + diagID);
                         resolvedErrors.push();
                     }
                 });
@@ -138,7 +138,10 @@ function whileCodingSFX(context) {
  * @param context - extension context
  */
 async function runWithCodeSFX(context) {
+    // keeps track of whether or not error sound has been played (one per run)
     let errorSoundPlayed = false;
+    // grabs platform (Windows or Mac)
+    const platform = process.platform;
     // changes selection color to transparent to prevent visual annoyances
     vscode.workspace
         .getConfiguration()
@@ -152,7 +155,12 @@ async function runWithCodeSFX(context) {
     // saves terminal command prompt
     let termPrompt = await vscode.env.clipboard.readText();
     console.log("Before substring: " + termPrompt);
-    const endOfPrompt = termPrompt.search("%");
+    // default to Windows / Linux
+    let endOfPrompt = termPrompt.search("$");
+    // change delimiter to % if on Mac
+    if (platform === "darwin") {
+        endOfPrompt = termPrompt.search("%");
+    }
     termPrompt = termPrompt.substring(0, endOfPrompt);
     console.log("After substring: " + termPrompt);
     const promptLength = termPrompt.length;

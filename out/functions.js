@@ -39,8 +39,6 @@ exports.isWhileCodingSFX = true;
 // vscode severity codes for different diagnostics \\
 const err = 0;
 const warn = 1;
-const info = 2;
-const hint = 3;
 // functions \\
 // incomplete. the goal is to make a mutable SFX function
 function playSFX(context, soundName) {
@@ -81,53 +79,62 @@ function whileCodingSFX(context) {
             let newLine = event.selections[0].active.line;
             // line changed
             if (newLine !== currentLine) {
+                // clear resolved errors
+                resolvedErrors = [];
                 handledDiags.forEach((diagID) => {
                     // diagnostic handled and resolved
                     if (!allDiags.has(diagID)) {
-                        console.log("deleting from handledDiags: " + diagID);
-                        resolvedErrors.push();
+                        resolvedErrors.push(diagID);
                     }
                 });
+                for (let diagID of resolvedErrors) {
+                    handledDiags.delete(diagID);
+                }
             }
             currentLine = newLine;
         });
         // listens for diagnostics while coding; triggers sounds accordingly
         exports.diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
             const diagnostics = vscode.languages.getDiagnostics();
+            // clear allDiags
+            allDiags.clear();
+            // populate diagnostic sets
             diagnostics.forEach(([, diagArray]) => {
                 diagArray.forEach((item) => {
                     let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
                     allDiags.add(diagID);
-                    if (handledDiags.has(diagID)) {
-                        return;
+                });
+            });
+            // clear resolved errors
+            resolvedErrors = [];
+            handledDiags.forEach((diagID) => {
+                if (!allDiags.has(diagID)) {
+                    resolvedErrors.push(diagID);
+                }
+            });
+            for (let diagID of resolvedErrors) {
+                handledDiags.delete(diagID);
+            }
+            // repopulate allDiags with new diagnostics
+            diagnostics.forEach(([, diagArray]) => {
+                diagArray.forEach((item) => {
+                    let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
+                    // play sound
+                    if (!handledDiags.has(diagID)) {
+                        // error
+                        if (item.severity === err) {
+                            const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
+                            sound_play_1.default.play(filePath);
+                            console.log("(While coding) error sound played!");
+                        }
+                        // warning
+                        if (item.severity === warn) {
+                            const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            sound_play_1.default.play(filePath);
+                            console.log("(While coding) warning sound played!");
+                        }
+                        handledDiags.add(diagID);
                     }
-                    // error
-                    if (item.severity === err) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
-                        sound_play_1.default.play(filePath);
-                        console.log("(While coding) error sound played!");
-                    }
-                    // warning
-                    if (item.severity === warn) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
-                        sound_play_1.default.play(filePath);
-                        console.log("(While coding) warning sound played!");
-                    }
-                    // add diagnostics to handled set after sound plays for it
-                    handledDiags.add(diagID);
-                    // update the handled set to remove resolved diagnostics
-                    for (let diagID of resolvedErrors) {
-                        handledDiags.delete(diagID);
-                    }
-                    // clear allDiags
-                    allDiags.clear();
-                    // repopulate allDiags with new diagnostics
-                    diagnostics.forEach(([, diagArray]) => {
-                        diagArray.forEach((item) => {
-                            let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
-                            allDiags.add(diagID);
-                        });
-                    });
                 });
             });
         });

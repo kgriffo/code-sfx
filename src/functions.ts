@@ -9,8 +9,6 @@ export let lineChangeListener: vscode.Disposable | undefined;
 // vscode severity codes for different diagnostics \\
 const err = 0;
 const warn = 1;
-const info = 2;
-const hint = 3;
 
 // functions \\
 // incomplete. the goal is to make a mutable SFX function
@@ -29,15 +27,16 @@ export function toggleWhileCodingSFX() {
 }
 
 /**
- * Handles the "while coding" SFX feature
+ * Executes the "while coding" SFX feature. "Handling" diagnostics in this context
+ * means to play a single sound accordingly
  * @param context - extension context
  */
 export function whileCodingSFX(context: vscode.ExtensionContext) {
   let allDiags: Set<string> = new Set<string>();
   let handledDiags: Set<string> = new Set<string>();
+  let resolvedDiags: string[] = [];
   let currentLine: number | undefined =
     vscode.window.activeTextEditor?.selection.active.line;
-  let resolvedErrors: string[] = [];
 
   // ensures diagnostic listener is activated correctly
   if (diagnosticListener) {
@@ -58,67 +57,85 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
         let newLine: number = event.selections[0].active.line;
         // line changed
         if (newLine !== currentLine) {
+          // clear resolvedDiags
+          resolvedDiags = [];
           handledDiags.forEach((diagID) => {
             // diagnostic handled and resolved
             if (!allDiags.has(diagID)) {
-              console.log("deleting from handledDiags: " + diagID);
-              resolvedErrors.push();
+              resolvedDiags.push(diagID);
             }
           });
+          // remove resolved diagnostics from handledDiags so that if the same diagnostic reoccurs,
+          // it will be handled correctly
+          for (let diagID of resolvedDiags) {
+            handledDiags.delete(diagID);
+          }
         }
         currentLine = newLine;
       }
     );
+
     // listens for diagnostics while coding; triggers sounds accordingly
     diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
       const diagnostics: [vscode.Uri, vscode.Diagnostic[]][] =
         vscode.languages.getDiagnostics();
 
+      // clear allDiags
+      allDiags.clear();
+      // populate allDiags
       diagnostics.forEach(([, diagArray]) => {
         diagArray.forEach((item: vscode.Diagnostic) => {
           let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
           allDiags.add(diagID);
+        });
+      });
 
-          if (handledDiags.has(diagID)) {
-            return;
-          }
+      // clear resolvedDiags
+      resolvedDiags = [];
+      handledDiags.forEach((diagID) => {
+        // diagnostic handled and resolved
+        if (!allDiags.has(diagID)) {
+          resolvedDiags.push(diagID);
+        }
+      });
 
-          // error
-          if (item.severity === err) {
-            const filePath: string = path.join(
-              context.extensionPath,
-              "sfx",
-              "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
-            );
-            sound.play(filePath);
-            console.log("(While coding) error sound played!");
-          }
+      // remove resolved diagnostics from handledDiags so that if the same diagnostic reoccurs,
+      // it will be handled correctly
+      for (let diagID of resolvedDiags) {
+        handledDiags.delete(diagID);
+      }
 
-          // warning
-          if (item.severity === warn) {
-            const filePath: string = path.join(
-              context.extensionPath,
-              "sfx",
-              "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
-            );
-            sound.play(filePath);
-            console.log("(While coding) warning sound played!");
+      // handle diagnostics
+      diagnostics.forEach(([, diagArray]) => {
+        diagArray.forEach((item: vscode.Diagnostic) => {
+          let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
+
+          // play sound
+          if (!handledDiags.has(diagID)) {
+            // error
+            if (item.severity === err) {
+              const filePath: string = path.join(
+                context.extensionPath,
+                "sfx",
+                "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
+              );
+              sound.play(filePath);
+              console.log("(While coding) error sound played!");
+            }
+
+            // warning
+            if (item.severity === warn) {
+              const filePath: string = path.join(
+                context.extensionPath,
+                "sfx",
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              sound.play(filePath);
+              console.log("(While coding) warning sound played!");
+            }
+            // add handled diagnostic to handledDiags
+            handledDiags.add(diagID);
           }
-          // add diagnostics to handled set after sound plays for it
-          handledDiags.add(diagID);
-          // update the handled set to remove resolved diagnostics
-          for (let diagID of resolvedErrors) {
-            handledDiags.delete(diagID);
-          }
-          // clear allDiags
-          allDiags.clear();
-          // repopulate allDiags with new diagnostics
-          diagnostics.forEach(([, diagArray]) => {
-            diagArray.forEach((item: vscode.Diagnostic) => {
-              let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
-              allDiags.add(diagID);
-            });
-          });
         });
       });
     });

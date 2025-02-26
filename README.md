@@ -1,6 +1,6 @@
-# codesfx README
+# CodeSFX README
 
-This is the README for your extension "codesfx". After writing up a brief description, we recommend including the following sections.
+CodeSFX is a Visual Studio Code extension for added accessibility; CodeSFX plays sound effects based on warnings and errors in your code both while writing it, and after running it.
 
 ## Features
 

@@ -54,14 +54,15 @@ function toggleWhileCodingSFX() {
     console.log(`Toggled whileCodingSFX: ${exports.isWhileCodingSFX}`);
 }
 /**
- * Handles the "while coding" SFX feature
+ * Executes the "while coding" SFX feature. "Handling" diagnostics in this context
+ * means to play a single sound accordingly
  * @param context - extension context
  */
 function whileCodingSFX(context) {
     let allDiags = new Set();
     let handledDiags = new Set();
+    let resolvedDiags = [];
     let currentLine = vscode.window.activeTextEditor?.selection.active.line;
-    let resolvedErrors = [];
     // ensures diagnostic listener is activated correctly
     if (exports.diagnosticListener) {
         exports.diagnosticListener.dispose();
@@ -79,15 +80,17 @@ function whileCodingSFX(context) {
             let newLine = event.selections[0].active.line;
             // line changed
             if (newLine !== currentLine) {
-                // clear resolved errors
-                resolvedErrors = [];
+                // clear resolvedDiags
+                resolvedDiags = [];
                 handledDiags.forEach((diagID) => {
                     // diagnostic handled and resolved
                     if (!allDiags.has(diagID)) {
-                        resolvedErrors.push(diagID);
+                        resolvedDiags.push(diagID);
                     }
                 });
-                for (let diagID of resolvedErrors) {
+                // remove resolved diagnostics from handledDiags so that if the same diagnostic reoccurs,
+                // it will be handled correctly
+                for (let diagID of resolvedDiags) {
                     handledDiags.delete(diagID);
                 }
             }
@@ -98,24 +101,27 @@ function whileCodingSFX(context) {
             const diagnostics = vscode.languages.getDiagnostics();
             // clear allDiags
             allDiags.clear();
-            // populate diagnostic sets
+            // populate allDiags
             diagnostics.forEach(([, diagArray]) => {
                 diagArray.forEach((item) => {
                     let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
                     allDiags.add(diagID);
                 });
             });
-            // clear resolved errors
-            resolvedErrors = [];
+            // clear resolvedDiags
+            resolvedDiags = [];
             handledDiags.forEach((diagID) => {
+                // diagnostic handled and resolved
                 if (!allDiags.has(diagID)) {
-                    resolvedErrors.push(diagID);
+                    resolvedDiags.push(diagID);
                 }
             });
-            for (let diagID of resolvedErrors) {
+            // remove resolved diagnostics from handledDiags so that if the same diagnostic reoccurs,
+            // it will be handled correctly
+            for (let diagID of resolvedDiags) {
                 handledDiags.delete(diagID);
             }
-            // repopulate allDiags with new diagnostics
+            // handle diagnostics
             diagnostics.forEach(([, diagArray]) => {
                 diagArray.forEach((item) => {
                     let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
@@ -133,6 +139,7 @@ function whileCodingSFX(context) {
                             sound_play_1.default.play(filePath);
                             console.log("(While coding) warning sound played!");
                         }
+                        // add handled diagnostic to handledDiags
                         handledDiags.add(diagID);
                     }
                 });
@@ -205,23 +212,25 @@ async function runWithCodeSFX(context) {
             if (output.includes(termPrompt, promptLength)) {
                 clearInterval(interval);
                 console.log("Script completed");
-                // error detected
+                // error detected (Python evaluated first, Java second)
                 if (output.includes("Error") || output.includes("Exception")) {
                     // divide by zero
-                    if (output.includes("ZeroDivisionError")) {
+                    if (output.includes("ZeroDivisionError") ||
+                        output.includes("/ by zero")) {
                         const filePath = path_1.default.join(context.extensionPath, "sfx", "(DivideByZero)G5(ish)_sawtooth_800hz_0.1s.wav");
                         sound_play_1.default.play(filePath);
                         errorSoundPlayed = true;
                         console.log("Divide by zero sound played!");
                     }
                     // index error (out of bounds)
-                    if (output.includes("IndexError")) {
+                    if (output.includes("IndexError") ||
+                        output.includes("ArrayIndexOutOfBoundsException")) {
                         const filePath = path_1.default.join(context.extensionPath, "sfx", "(IndexError)B4(ish)_sawtooth_500hz_0.1s.wav");
                         sound_play_1.default.play(filePath);
                         errorSoundPlayed = true;
                         console.log("Index error sound played!");
                     }
-                    // type error
+                    // type error (Python only)
                     if (output.includes("TypeError")) {
                         const filePath = path_1.default.join(context.extensionPath, "sfx", "(TypeError)D5(ish)_sawtooth_600hz_0.1s.wav");
                         sound_play_1.default.play(filePath);

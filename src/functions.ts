@@ -215,10 +215,13 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
       if (output.includes(termPrompt, promptLength)) {
         clearInterval(interval);
         console.log("Script completed");
-        // error detected
+        // error detected (Python first, Java second)
         if (output.includes("Error") || output.includes("Exception")) {
           // divide by zero
-          if (output.includes("ZeroDivisionError")) {
+          if (
+            output.includes("ZeroDivisionError") ||
+            output.includes("/ by zero")
+          ) {
             const filePath: string = path.join(
               context.extensionPath,
               "sfx",
@@ -230,7 +233,10 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
           }
 
           // index error (out of bounds)
-          if (output.includes("IndexError")) {
+          if (
+            output.includes("IndexError") ||
+            output.includes("ArrayIndexOutOfBoundsException")
+          ) {
             const filePath: string = path.join(
               context.extensionPath,
               "sfx",
@@ -241,7 +247,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
             console.log("Index error sound played!");
           }
 
-          // type error
+          // type error (Python only)
           if (output.includes("TypeError")) {
             const filePath: string = path.join(
               context.extensionPath,

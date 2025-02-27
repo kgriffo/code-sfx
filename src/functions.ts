@@ -11,7 +11,11 @@ const err = 0;
 const warn = 1;
 
 // functions \\
-// incomplete. the goal is to make a mutable SFX function
+/**
+ * Plays sound file
+ * @param context - extension context
+ * @param soundName - name of sound file
+ */
 export function playSFX(context: vscode.ExtensionContext, soundName: string) {
   let sfxFolder: string = "sfx";
   const filePath = path.join(context.extensionPath, sfxFolder, soundName);
@@ -109,30 +113,28 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
       diagnostics.forEach(([, diagArray]) => {
         diagArray.forEach((item: vscode.Diagnostic) => {
           let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
-
-          // play sound
           if (!handledDiags.has(diagID)) {
-            // error
-            if (item.severity === err) {
-              const filePath: string = path.join(
-                context.extensionPath,
-                "sfx",
-                "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
-              );
-              sound.play(filePath);
-              console.log("(While coding) error sound played!");
-            }
+            // play sound
+            setTimeout(() => {
+              // error
+              if (item.severity === err) {
+                playSFX(
+                  context,
+                  "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
+                );
+                console.log("(While coding) error sound played!");
+              }
 
-            // warning
-            if (item.severity === warn) {
-              const filePath: string = path.join(
-                context.extensionPath,
-                "sfx",
-                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
-              );
-              sound.play(filePath);
-              console.log("(While coding) warning sound played!");
-            }
+              // warning
+              if (item.severity === warn) {
+                playSFX(
+                  context,
+                  "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+                );
+                console.log("(While coding) warning sound played!");
+              }
+            }, 2000);
+
             // add handled diagnostic to handledDiags
             handledDiags.add(diagID);
           }
@@ -170,9 +172,9 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
   // saves terminal command prompt
   let termPrompt: string = await vscode.env.clipboard.readText();
   console.log("Before substring: " + termPrompt);
-  // default to Windows / Linux
+  // default to bash
   let endOfPrompt: number = termPrompt.search("$");
-  // change delimiter to % if on Mac
+  // change delimiter to % if zsh
   if (platform === "darwin") {
     endOfPrompt = termPrompt.search("%");
   }

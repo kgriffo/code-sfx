@@ -40,7 +40,11 @@ exports.isWhileCodingSFX = true;
 const err = 0;
 const warn = 1;
 // functions \\
-// incomplete. the goal is to make a mutable SFX function
+/**
+ * Plays sound file
+ * @param context - extension context
+ * @param soundName - name of sound file
+ */
 function playSFX(context, soundName) {
     let sfxFolder = "sfx";
     const filePath = path_1.default.join(context.extensionPath, sfxFolder, soundName);
@@ -125,20 +129,20 @@ function whileCodingSFX(context) {
             diagnostics.forEach(([, diagArray]) => {
                 diagArray.forEach((item) => {
                     let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
-                    // play sound
                     if (!handledDiags.has(diagID)) {
-                        // error
-                        if (item.severity === err) {
-                            const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
-                            sound_play_1.default.play(filePath);
-                            console.log("(While coding) error sound played!");
-                        }
-                        // warning
-                        if (item.severity === warn) {
-                            const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
-                            sound_play_1.default.play(filePath);
-                            console.log("(While coding) warning sound played!");
-                        }
+                        // play sound
+                        setTimeout(() => {
+                            // error
+                            if (item.severity === err) {
+                                playSFX(context, "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
+                                console.log("(While coding) error sound played!");
+                            }
+                            // warning
+                            if (item.severity === warn) {
+                                playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                                console.log("(While coding) warning sound played!");
+                            }
+                        }, 2000);
                         // add handled diagnostic to handledDiags
                         handledDiags.add(diagID);
                     }
@@ -169,9 +173,9 @@ async function runWithCodeSFX(context) {
     // saves terminal command prompt
     let termPrompt = await vscode.env.clipboard.readText();
     console.log("Before substring: " + termPrompt);
-    // default to Windows / Linux
+    // default to bash
     let endOfPrompt = termPrompt.search("$");
-    // change delimiter to % if on Mac
+    // change delimiter to % if zsh
     if (platform === "darwin") {
         endOfPrompt = termPrompt.search("%");
     }
@@ -212,7 +216,7 @@ async function runWithCodeSFX(context) {
             if (output.includes(termPrompt, promptLength)) {
                 clearInterval(interval);
                 console.log("Script completed");
-                // error detected (Python evaluated first, Java second)
+                // error detected (Python first, Java second)
                 if (output.includes("Error") || output.includes("Exception")) {
                     // divide by zero
                     if (output.includes("ZeroDivisionError") ||

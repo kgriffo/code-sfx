@@ -41,6 +41,7 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
   let resolvedDiags: string[] = [];
   let currentLine: number | undefined =
     vscode.window.activeTextEditor?.selection.active.line;
+  let lineChange: boolean = false;
 
   // ensures diagnostic listener is activated correctly
   if (diagnosticListener) {
@@ -57,8 +58,10 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
     // listens for line changes while coding; used to determine whether or not errors have been resolved
     lineChangeListener = vscode.window.onDidChangeTextEditorSelection(
       (event) => {
+        console.log("current line: " + currentLine);
         // selections[0].active.line is the line the cursor is on (zero indexed)
         let newLine: number = event.selections[0].active.line;
+        console.log("new line: " + newLine);
         // line changed
         if (newLine !== currentLine) {
           // clear resolvedDiags
@@ -74,6 +77,7 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
           for (let diagID of resolvedDiags) {
             handledDiags.delete(diagID);
           }
+          lineChange = true;
         }
         currentLine = newLine;
       }
@@ -113,7 +117,8 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
       diagnostics.forEach(([, diagArray]) => {
         diagArray.forEach((item: vscode.Diagnostic) => {
           let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
-          if (!handledDiags.has(diagID)) {
+          if (lineChange && !handledDiags.has(diagID)) {
+            console.log("sound should be played");
             // play sound
             // error
             if (item.severity === err) {
@@ -135,6 +140,8 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
 
             // add handled diagnostic to handledDiags
             handledDiags.add(diagID);
+            // reset lineChange to false
+            lineChange = false;
           }
         });
       });

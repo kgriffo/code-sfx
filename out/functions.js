@@ -67,6 +67,7 @@ function whileCodingSFX(context) {
     let handledDiags = new Set();
     let resolvedDiags = [];
     let currentLine = vscode.window.activeTextEditor?.selection.active.line;
+    let lineChange = false;
     // ensures diagnostic listener is activated correctly
     if (exports.diagnosticListener) {
         exports.diagnosticListener.dispose();
@@ -80,8 +81,10 @@ function whileCodingSFX(context) {
     if (exports.isWhileCodingSFX) {
         // listens for line changes while coding; used to determine whether or not errors have been resolved
         exports.lineChangeListener = vscode.window.onDidChangeTextEditorSelection((event) => {
+            console.log("current line: " + currentLine);
             // selections[0].active.line is the line the cursor is on (zero indexed)
             let newLine = event.selections[0].active.line;
+            console.log("new line: " + newLine);
             // line changed
             if (newLine !== currentLine) {
                 // clear resolvedDiags
@@ -97,6 +100,7 @@ function whileCodingSFX(context) {
                 for (let diagID of resolvedDiags) {
                     handledDiags.delete(diagID);
                 }
+                lineChange = true;
             }
             currentLine = newLine;
         });
@@ -129,7 +133,8 @@ function whileCodingSFX(context) {
             diagnostics.forEach(([, diagArray]) => {
                 diagArray.forEach((item) => {
                     let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
-                    if (!handledDiags.has(diagID)) {
+                    if (lineChange && !handledDiags.has(diagID)) {
+                        console.log("sound should be played");
                         // play sound
                         // error
                         if (item.severity === err) {
@@ -143,6 +148,8 @@ function whileCodingSFX(context) {
                         }
                         // add handled diagnostic to handledDiags
                         handledDiags.add(diagID);
+                        // reset lineChange to false
+                        lineChange = false;
                     }
                 });
             });

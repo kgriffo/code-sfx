@@ -115,25 +115,23 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
           let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
           if (!handledDiags.has(diagID)) {
             // play sound
-            setTimeout(() => {
-              // error
-              if (item.severity === err) {
-                playSFX(
-                  context,
-                  "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
-                );
-                console.log("(While coding) error sound played!");
-              }
+            // error
+            if (item.severity === err) {
+              playSFX(
+                context,
+                "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
+              );
+              console.log("(While coding) error sound played!");
+            }
 
-              // warning
-              if (item.severity === warn) {
-                playSFX(
-                  context,
-                  "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
-                );
-                console.log("(While coding) warning sound played!");
-              }
-            }, 2000);
+            // warning
+            if (item.severity === warn) {
+              playSFX(
+                context,
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              console.log("(While coding) warning sound played!");
+            }
 
             // add handled diagnostic to handledDiags
             handledDiags.add(diagID);

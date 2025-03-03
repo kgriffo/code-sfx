@@ -6,9 +6,6 @@ import * as vscode from "vscode";
 export let isWhileCodingSFX: boolean = true;
 export let diagnosticListener: vscode.Disposable | undefined;
 export let lineChangeListener: vscode.Disposable | undefined;
-// vscode severity codes for different diagnostics \\
-const err = 0;
-const warn = 1;
 
 // functions \\
 /**
@@ -58,14 +55,26 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
     // listens for line changes while coding; used to determine whether or not errors have been resolved
     lineChangeListener = vscode.window.onDidChangeTextEditorSelection(
       (event) => {
+        console.log("---NEW LOGS---");
         console.log("current line: " + currentLine);
+        console.log("handledDiags size = " + handledDiags.size);
+        console.log("allDiags size = " + allDiags.size);
         // selections[0].active.line is the line the cursor is on (zero indexed)
         let newLine: number = event.selections[0].active.line;
-        console.log("new line: " + newLine);
+        // line didn't change
+        if (newLine === currentLine) {
+          lineChange = false;
+        }
         // line changed
         if (newLine !== currentLine) {
+          console.log("new line: " + newLine);
+          // set lineChange flag to true (user changed line)
+          lineChange = true;
+          // set updated currentLine
+          currentLine = newLine;
           // clear resolvedDiags
           resolvedDiags = [];
+
           handledDiags.forEach((diagID) => {
             // diagnostic handled and resolved
             if (!allDiags.has(diagID)) {
@@ -74,17 +83,24 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
           });
           // remove resolved diagnostics from handledDiags so that if the same diagnostic reoccurs,
           // it will be handled correctly
-          for (let diagID of resolvedDiags) {
+          resolvedDiags.forEach((diagID) => {
             handledDiags.delete(diagID);
-          }
-          lineChange = true;
+          });
+          handleDiagnostics();
         }
-        currentLine = newLine;
+        console.log("lineChange = " + lineChange);
       }
     );
 
-    // listens for diagnostics while coding; triggers sounds accordingly
     diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
+      handleDiagnostics();
+    });
+
+    /**
+     * Plays sounds accordingly for each diagnostic
+     */
+    function handleDiagnostics() {
+      // listens for diagnostics while coding; triggers sounds accordingly
       const diagnostics: [vscode.Uri, vscode.Diagnostic[]][] =
         vscode.languages.getDiagnostics();
 
@@ -98,6 +114,10 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
         });
       });
 
+      if (!lineChange) {
+        return;
+      }
+
       // clear resolvedDiags
       resolvedDiags = [];
       handledDiags.forEach((diagID) => {
@@ -109,43 +129,35 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
 
       // remove resolved diagnostics from handledDiags so that if the same diagnostic reoccurs,
       // it will be handled correctly
-      for (let diagID of resolvedDiags) {
+      resolvedDiags.forEach((diagID) => {
         handledDiags.delete(diagID);
-      }
+      });
 
       // handle diagnostics
-      diagnostics.forEach(([, diagArray]) => {
-        diagArray.forEach((item: vscode.Diagnostic) => {
-          let diagID = `Severity: ${item.severity} Start line: ${item.range.start.line} End line: ${item.range.end.line} Message: ${item.message}`;
-          if (lineChange && !handledDiags.has(diagID)) {
-            console.log("sound should be played");
-            // play sound
-            // error
-            if (item.severity === err) {
-              playSFX(
-                context,
-                "(while_coding_error)A4_sawtooth_440hz_0.1s.wav"
-              );
-              console.log("(While coding) error sound played!");
-            }
-
-            // warning
-            if (item.severity === warn) {
-              playSFX(
-                context,
-                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
-              );
-              console.log("(While coding) warning sound played!");
-            }
-
-            // add handled diagnostic to handledDiags
-            handledDiags.add(diagID);
-            // reset lineChange to false
-            lineChange = false;
+      allDiags.forEach((diagID) => {
+        if (lineChange && !handledDiags.has(diagID)) {
+          console.log("sound triggered");
+          // play sound
+          // error
+          if (diagID.includes("Severity: 0")) {
+            playSFX(context, "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
+            console.log("(While coding) error sound played!");
           }
-        });
+
+          // warning
+          if (diagID.includes("Severity: 1")) {
+            playSFX(
+              context,
+              "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+            );
+            console.log("(While coding) warning sound played!");
+          }
+
+          // add handled diagnostic to handledDiags
+          handledDiags.add(diagID);
+        }
       });
-    });
+    }
   }
 }
 

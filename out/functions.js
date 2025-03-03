@@ -141,15 +141,17 @@ function whileCodingSFX(context) {
             allDiags.forEach((diagID) => {
                 // play sound
                 if (lineChange && !handledDiags.has(diagID)) {
-                    // error
-                    if (diagID.includes("Severity: 0")) {
-                        playSFX(context, "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
-                        console.log("(While coding) error sound played!");
-                    }
-                    // warning
-                    if (diagID.includes("Severity: 1")) {
-                        playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
-                        console.log("(While coding) warning sound played!");
+                    switch (true) {
+                        // error
+                        case diagID.includes("Severity: 0"):
+                            playSFX(context, "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
+                            console.log("(While coding) error sound played!");
+                            break;
+                        // warning
+                        case diagID.includes("Severity: 1"):
+                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            console.log("(While coding) warning sound played!");
+                            break;
                     }
                     // add handled diagnostic to handledDiags
                     handledDiags.add(diagID);
@@ -225,34 +227,28 @@ async function runWithCodeSFX(context) {
                 console.log("Script completed");
                 // error detected (Python first, Java second)
                 if (output.includes("Error") || output.includes("Exception")) {
-                    // divide by zero
-                    if (output.includes("ZeroDivisionError") ||
-                        output.includes("/ by zero")) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(DivideByZero)G5(ish)_sawtooth_800hz_0.1s.wav");
-                        sound_play_1.default.play(filePath);
-                        errorSoundPlayed = true;
-                        console.log("Divide by zero sound played!");
-                    }
-                    // index error (out of bounds)
-                    if (output.includes("IndexError") ||
-                        output.includes("ArrayIndexOutOfBoundsException")) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(IndexError)B4(ish)_sawtooth_500hz_0.1s.wav");
-                        sound_play_1.default.play(filePath);
-                        errorSoundPlayed = true;
-                        console.log("Index error sound played!");
-                    }
-                    // type error (Python only)
-                    if (output.includes("TypeError")) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(TypeError)D5(ish)_sawtooth_600hz_0.1s.wav");
-                        sound_play_1.default.play(filePath);
-                        errorSoundPlayed = true;
-                        console.log("Type error sound played!");
-                    }
-                    // general error
-                    if (!errorSoundPlayed) {
-                        const filePath = path_1.default.join(context.extensionPath, "sfx", "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
-                        sound_play_1.default.play(filePath);
-                        console.log("General error sound played!");
+                    switch (true) {
+                        // divide by zero
+                        case output.includes("ZeroDivisionError") ||
+                            output.includes("/ by zero"):
+                            playSFX(context, "(DivideByZero)G5(ish)_sawtooth_800hz_0.1s.wav");
+                            console.log("Divide by zero sound played!");
+                            break;
+                        // index error (out of bounds)
+                        case output.includes("IndexError") ||
+                            output.includes("ArrayIndexOutOfBoundsException"):
+                            playSFX(context, "(IndexError)B4(ish)_sawtooth_500hz_0.1s.wav");
+                            console.log("Index error sound played!");
+                            break;
+                        // type error (Python only)
+                        case output.includes("TypeError"):
+                            playSFX(context, "(TypeError)D5(ish)_sawtooth_600hz_0.1s.wav");
+                            console.log("Type error sound played!");
+                            break;
+                        // general error
+                        default:
+                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            console.log("General error sound played!");
                     }
                     vscode.workspace
                         .getConfiguration()
@@ -262,9 +258,9 @@ async function runWithCodeSFX(context) {
                     // no errors
                 }
                 else {
-                    const filePath = path_1.default.join(context.extensionPath, "sfx", "(no_errors)A5_sine_880hz_0.1s.wav");
-                    sound_play_1.default.play(filePath);
+                    playSFX(context, "(no_errors)A5_sine_880hz_0.1s.wav");
                     console.log("Sound played!");
+                    // set selection color back to default
                     vscode.workspace
                         .getConfiguration()
                         .update("workbench.colorCustomizations", { "terminal.selectionBackground": "default" }, vscode.ConfigurationTarget.Global);

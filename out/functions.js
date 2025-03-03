@@ -82,6 +82,7 @@ function whileCodingSFX(context) {
             console.log("current line: " + currentLine);
             console.log("handledDiags size = " + handledDiags.size);
             console.log("allDiags size = " + allDiags.size);
+            console.log("resolvedDiags size = " + resolvedDiags.length);
             // selections[0].active.line is the line the cursor is on (zero indexed)
             let newLine = event.selections[0].active.line;
             // line didn't change
@@ -95,23 +96,12 @@ function whileCodingSFX(context) {
                 lineChange = true;
                 // set updated currentLine
                 currentLine = newLine;
-                // clear resolvedDiags
-                resolvedDiags = [];
-                handledDiags.forEach((diagID) => {
-                    // diagnostic handled and resolved
-                    if (!allDiags.has(diagID)) {
-                        resolvedDiags.push(diagID);
-                    }
-                });
-                // remove resolved diagnostics from handledDiags so that if the same diagnostic reoccurs,
-                // it will be handled correctly
-                resolvedDiags.forEach((diagID) => {
-                    handledDiags.delete(diagID);
-                });
+                // handle diagnostics
                 handleDiagnostics();
             }
             console.log("lineChange = " + lineChange);
         });
+        // listens for diagnostics while coding; triggers sounds accordingly
         exports.diagnosticListener = vscode.languages.onDidChangeDiagnostics(() => {
             handleDiagnostics();
         });
@@ -119,7 +109,6 @@ function whileCodingSFX(context) {
          * Plays sounds accordingly for each diagnostic
          */
         function handleDiagnostics() {
-            // listens for diagnostics while coding; triggers sounds accordingly
             const diagnostics = vscode.languages.getDiagnostics();
             // clear allDiags
             allDiags.clear();
@@ -130,13 +119,9 @@ function whileCodingSFX(context) {
                     allDiags.add(diagID);
                 });
             });
-            if (!lineChange) {
-                return;
-            }
-            // clear resolvedDiags
-            resolvedDiags = [];
+            // check for handled and resolved diagnostics
             handledDiags.forEach((diagID) => {
-                // diagnostic handled and resolved
+                console.log("checking for handled and resolved");
                 if (!allDiags.has(diagID)) {
                     resolvedDiags.push(diagID);
                 }
@@ -144,13 +129,18 @@ function whileCodingSFX(context) {
             // remove resolved diagnostics from handledDiags so that if the same diagnostic reoccurs,
             // it will be handled correctly
             resolvedDiags.forEach((diagID) => {
+                console.log("removing resolved");
                 handledDiags.delete(diagID);
             });
+            // clear resolvedDiags
+            resolvedDiags = [];
+            if (!lineChange) {
+                return;
+            }
             // handle diagnostics
             allDiags.forEach((diagID) => {
+                // play sound
                 if (lineChange && !handledDiags.has(diagID)) {
-                    console.log("sound triggered");
-                    // play sound
                     // error
                     if (diagID.includes("Severity: 0")) {
                         playSFX(context, "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");

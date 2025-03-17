@@ -230,8 +230,8 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
         console.log("Script completed");
         // error detection
         if (
-          output.toLowerCase().includes("error") || //python
-          output.toLowerCase().includes("exception") //java
+          output.includes("Error") || //python
+          output.includes("Exception") //java
         ) {
           switch (true) {
             // divide by zero

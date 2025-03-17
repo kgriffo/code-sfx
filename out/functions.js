@@ -224,8 +224,8 @@ async function runWithCodeSFX(context) {
                 clearInterval(interval);
                 console.log("Script completed");
                 // error detection
-                if (output.toLowerCase().includes("error") || //python
-                    output.toLowerCase().includes("exception") //java
+                if (output.includes("Error") || //python
+                    output.includes("Exception") //java
                 ) {
                     switch (true) {
                         // divide by zero

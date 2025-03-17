@@ -1,5 +1,5 @@
 import path from "path";
-import sound from "sound-play";
+import sound, { play } from "sound-play";
 import * as vscode from "vscode";
 
 // function variables \\
@@ -234,24 +234,92 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
         if (output.includes("Error") || output.includes("Exception")) {
           switch (true) {
             // divide by zero
-            case output.includes("ZeroDivisionError") ||
-              output.includes("/ by zero"):
+            case output.includes("ZeroDivisionError") || //python
+              output.includes("/ by zero"): //java
               playSFX(context, "(DivideByZero)G5(ish)_sawtooth_800hz_0.1s.wav");
               console.log("Divide by zero sound played!");
               break;
 
-            // index error (out of bounds)
-            case output.includes("IndexError") ||
-              output.includes("ArrayIndexOutOfBoundsException"):
+            // index out of bounds error
+            case output.includes("IndexError") || //python
+              output.includes("ArrayIndexOutOfBoundsException"): //java
               playSFX(context, "(IndexError)B4(ish)_sawtooth_500hz_0.1s.wav");
-              console.log("Index error sound played!");
+              console.log("Index out of bounds error sound played!");
               break;
 
-            // type error (Python only)
-            case output.includes("TypeError"):
+            // type error / cast exception
+            case output.includes("TypeError") || //python
+              output.includes("ClassCastException"): //java
               playSFX(context, "(TypeError)D5(ish)_sawtooth_600hz_0.1s.wav");
-              console.log("Type error sound played!");
+              console.log("Type error / cast exception sound played!");
               break;
+
+            // stack overflow
+            case output.includes("RecursionError") || //pthon
+              output.includes("StackOverflowError"): //java
+              playSFX(
+                context,
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              console.log("Stack overflow sound played!");
+
+            // attribute error / null pointer exception
+            case output.includes("AttributeError") || //python
+              output.includes("NullPointerException"): //java
+              playSFX(
+                context,
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              console.log(
+                "Attribute error / null pointer exception sound played!"
+              );
+
+            // value error / number format exception
+            case output.includes("ValueError") || //python
+              output.includes("NumberFormatException"): //java
+              playSFX(
+                context,
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              console.log(
+                "Value error / number format exception sound played!"
+              );
+
+            // iteration and modification error
+            case output.includes("changed size during iteration") || //python
+              output.includes("ConcurrentModificationException"): //java
+              playSFX(
+                context,
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              console.log("Iteration and modification error sound played!");
+
+            // I/O Error
+            case output.includes("IOError") || //python
+              output.includes("IOException"): //java
+              playSFX(
+                context,
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              console.log("I/O error sound played!");
+
+            // invalid import error
+            case output.includes("ModuleNotFoundError") || //python
+              output.includes("ClassNotFoundException"): //java
+              playSFX(
+                context,
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              console.log("Invalid import sound played!");
+
+            // memory error
+            case output.includes("MemoryError") || //python
+              output.includes("OutOfMemoryError"): //java
+              playSFX(
+                context,
+                "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
+              );
+              console.log("Memory error sound played!");
 
             // general error
             default:

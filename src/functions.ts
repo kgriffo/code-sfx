@@ -1,5 +1,5 @@
 import path from "path";
-import sound, { play } from "sound-play";
+import sound from "sound-play";
 import * as vscode from "vscode";
 
 // function variables \\

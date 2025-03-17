@@ -262,6 +262,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
                 "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
               );
               console.log("Stack overflow sound played!");
+              break;
 
             // attribute error / null pointer exception
             case output.includes("AttributeError") || //python
@@ -273,6 +274,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
               console.log(
                 "Attribute error / null pointer exception sound played!"
               );
+              break;
 
             // value error / number format exception
             case output.includes("ValueError") || //python
@@ -284,6 +286,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
               console.log(
                 "Value error / number format exception sound played!"
               );
+              break;
 
             // iteration and modification error
             case output.includes("changed size during iteration") || //python
@@ -293,6 +296,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
                 "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
               );
               console.log("Iteration and modification error sound played!");
+              break;
 
             // I/O Error
             case output.includes("IOError") || //python
@@ -302,6 +306,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
                 "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
               );
               console.log("I/O error sound played!");
+              break;
 
             // invalid import error
             case output.includes("ModuleNotFoundError") || //python
@@ -311,6 +316,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
                 "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
               );
               console.log("Invalid import sound played!");
+              break;
 
             // memory error
             case output.includes("MemoryError") || //python
@@ -320,6 +326,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
                 "(while_coding_warning)A4_triangle_440hz_0.1s.wav"
               );
               console.log("Memory error sound played!");
+              break;
 
             // general error
             default:

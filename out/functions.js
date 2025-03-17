@@ -165,8 +165,6 @@ function whileCodingSFX(context) {
  * @param context - extension context
  */
 async function runWithCodeSFX(context) {
-    // keeps track of whether or not error sound has been played (one per run)
-    let errorSoundPlayed = false;
     // grabs platform (Windows or Mac)
     const platform = process.platform;
     // changes selection color to transparent to prevent visual annoyances
@@ -225,8 +223,10 @@ async function runWithCodeSFX(context) {
             if (output.includes(termPrompt, promptLength)) {
                 clearInterval(interval);
                 console.log("Script completed");
-                // error detected (Python first, Java second)
-                if (output.includes("Error") || output.includes("Exception")) {
+                // error detection
+                if (output.toLowerCase().includes("error") || //python
+                    output.toLowerCase().includes("exception") //java
+                ) {
                     switch (true) {
                         // divide by zero
                         case output.includes("ZeroDivisionError") || //python
@@ -251,36 +251,43 @@ async function runWithCodeSFX(context) {
                             output.includes("StackOverflowError"): //java
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                             console.log("Stack overflow sound played!");
+                            break;
                         // attribute error / null pointer exception
                         case output.includes("AttributeError") || //python
                             output.includes("NullPointerException"): //java
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                             console.log("Attribute error / null pointer exception sound played!");
+                            break;
                         // value error / number format exception
                         case output.includes("ValueError") || //python
                             output.includes("NumberFormatException"): //java
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                             console.log("Value error / number format exception sound played!");
+                            break;
                         // iteration and modification error
                         case output.includes("changed size during iteration") || //python
                             output.includes("ConcurrentModificationException"): //java
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                             console.log("Iteration and modification error sound played!");
+                            break;
                         // I/O Error
                         case output.includes("IOError") || //python
                             output.includes("IOException"): //java
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                             console.log("I/O error sound played!");
+                            break;
                         // invalid import error
                         case output.includes("ModuleNotFoundError") || //python
                             output.includes("ClassNotFoundException"): //java
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                             console.log("Invalid import sound played!");
+                            break;
                         // memory error
                         case output.includes("MemoryError") || //python
                             output.includes("OutOfMemoryError"): //java
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                             console.log("Memory error sound played!");
+                            break;
                         // general error
                         default:
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
@@ -295,7 +302,7 @@ async function runWithCodeSFX(context) {
                 }
                 else {
                     playSFX(context, "(no_errors)A5_sine_880hz_0.1s.wav");
-                    console.log("Sound played!");
+                    console.log("All-clear sound played!");
                     // set selection color back to default
                     vscode.workspace
                         .getConfiguration()

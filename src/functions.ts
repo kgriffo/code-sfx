@@ -162,8 +162,6 @@ export function whileCodingSFX(context: vscode.ExtensionContext) {
  * @param context - extension context
  */
 export async function runWithCodeSFX(context: vscode.ExtensionContext) {
-  // keeps track of whether or not error sound has been played (one per run)
-  let errorSoundPlayed: boolean = false;
   // grabs platform (Windows or Mac)
   const platform: string = process.platform;
   // changes selection color to transparent to prevent visual annoyances
@@ -230,8 +228,11 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
       if (output.includes(termPrompt, promptLength)) {
         clearInterval(interval);
         console.log("Script completed");
-        // error detected (Python first, Java second)
-        if (output.includes("Error") || output.includes("Exception")) {
+        // error detection
+        if (
+          output.toLowerCase().includes("error") || //python
+          output.toLowerCase().includes("exception") //java
+        ) {
           switch (true) {
             // divide by zero
             case output.includes("ZeroDivisionError") || //python
@@ -352,7 +353,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
           // no errors
         } else {
           playSFX(context, "(no_errors)A5_sine_880hz_0.1s.wav");
-          console.log("Sound played!");
+          console.log("All-clear sound played!");
 
           // set selection color back to default
           vscode.workspace

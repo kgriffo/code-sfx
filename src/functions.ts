@@ -231,7 +231,8 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
         // error detection
         if (
           output.includes("Error") || //python
-          output.includes("Exception") //java
+          output.includes("Exception") || //java
+          output.includes("compilation failed") //java
         ) {
           switch (true) {
             // divide by zero

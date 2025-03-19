@@ -225,7 +225,8 @@ async function runWithCodeSFX(context) {
                 console.log("Script completed");
                 // error detection
                 if (output.includes("Error") || //python
-                    output.includes("Exception") //java
+                    output.includes("Exception") || //java
+                    output.includes("compilation failed") //java
                 ) {
                     switch (true) {
                         // divide by zero

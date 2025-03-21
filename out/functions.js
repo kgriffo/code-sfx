@@ -253,11 +253,11 @@ async function runWithCodeSFX(context) {
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
                             console.log("Stack overflow sound played!");
                             break;
-                        // attribute error / null pointer exception
-                        case output.includes("AttributeError") || //python
+                        // key error / null pointer exception
+                        case output.includes("KeyError") || //python
                             output.includes("NullPointerException"): //java
                             playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
-                            console.log("Attribute error / null pointer exception sound played!");
+                            console.log("Key error / null pointer exception sound played!");
                             break;
                         // value error / number format exception
                         case output.includes("ValueError") || //python

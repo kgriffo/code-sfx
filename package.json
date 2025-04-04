@@ -1,14 +1,15 @@
 {
   "name": "codesfx",
   "displayName": "CodeSFX",
-  "description": "",
-  "version": "0.0.1",
+  "description": "CodeSFX plays sound effects based on warnings and errors in your code both while writing it, and after running it.",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.95.0"
   },
   "categories": [
     "Other"
   ],
+  "icon": "images/CodeSFX_Icon.png",
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -27,7 +28,8 @@
       "codesfx": [
         {
           "id": "codesfx",
-          "name": "CodeSFX"
+          "name": "CodeSFX",
+          "icon": ""
         }
       ]
     },
@@ -65,5 +67,9 @@
   "dependencies": {
     "@vscode/codicons": "^0.0.36",
     "sound-play": "^1.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kgriffo/code-sfx"
   }
 }

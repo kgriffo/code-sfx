@@ -144,12 +144,12 @@ function whileCodingSFX(context) {
                     switch (true) {
                         // error
                         case diagID.includes("Severity: 0"):
-                            playSFX(context, "(while_coding_error)A4_sawtooth_440hz_0.1s.wav");
+                            playSFX(context, "WhileCodingError.wav");
                             console.log("(While coding) error sound played!");
                             break;
                         // warning
                         case diagID.includes("Severity: 1"):
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "WhileCodingWarning.wav");
                             console.log("(While coding) warning sound played!");
                             break;
                     }
@@ -232,61 +232,61 @@ async function runWithCodeSFX(context) {
                         // divide by zero
                         case output.includes("ZeroDivisionError") || //python
                             output.includes("/ by zero"): //java
-                            playSFX(context, "(DivideByZero)G5(ish)_sawtooth_800hz_0.1s.wav");
+                            playSFX(context, "DivideByZero.wav");
                             console.log("Divide by zero sound played!");
                             break;
                         // index out of bounds error
                         case output.includes("IndexError") || //python
                             output.includes("ArrayIndexOutOfBoundsException"): //java
-                            playSFX(context, "(IndexError)B4(ish)_sawtooth_500hz_0.1s.wav");
+                            playSFX(context, "IndexOutOfBounds.wav");
                             console.log("Index out of bounds error sound played!");
                             break;
                         // type error / cast exception
                         case output.includes("TypeError") || //python
                             output.includes("ClassCastException"): //java
-                            playSFX(context, "(TypeError)D5(ish)_sawtooth_600hz_0.1s.wav");
+                            playSFX(context, "TypeError.wav");
                             console.log("Type error / cast exception sound played!");
                             break;
                         // stack overflow
                         case output.includes("RecursionError") || //pthon
                             output.includes("StackOverflowError"): //java
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "StackOverflow.wav");
                             console.log("Stack overflow sound played!");
                             break;
                         // key error / null pointer exception
                         case output.includes("KeyError") || //python
                             output.includes("NullPointerException"): //java
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "KeyError.wav");
                             console.log("Key error / null pointer exception sound played!");
                             break;
                         // value error / number format exception
                         case output.includes("ValueError") || //python
                             output.includes("NumberFormatException"): //java
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "ValueError.wav");
                             console.log("Value error / number format exception sound played!");
                             break;
                         // iteration and modification error
                         case output.includes("changed size during iteration") || //python
                             output.includes("ConcurrentModificationException"): //java
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "IterationAndModification.wav");
                             console.log("Iteration and modification error sound played!");
                             break;
                         // I/O Error
                         case output.includes("IOError") || //python
                             output.includes("IOException"): //java
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "IOError.wav");
                             console.log("I/O error sound played!");
                             break;
                         // invalid import error
                         case output.includes("ModuleNotFoundError") || //python
                             output.includes("ClassNotFoundException"): //java
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "InvalidImportError.wav");
                             console.log("Invalid import sound played!");
                             break;
                         // memory error
                         case output.includes("MemoryError") || //python
                             output.includes("OutOfMemoryError"): //java
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "MemoryError.wav");
                             console.log("Memory error sound played!");
                             break;
                         // general error

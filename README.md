@@ -20,3 +20,8 @@ Coming soon!
 ### 1.0.0
 
 Initial release of CodeSFX.
+
+## Acknowledgements
+
+Sound files - Jonathan Snead
+CodeSFX logo - Sheldon Marshall

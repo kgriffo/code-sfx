@@ -23,5 +23,5 @@ Initial release of CodeSFX.
 
 ## Acknowledgements
 
-Sound files - Jonathan Snead
+Sound files - Jonathan Snead  
 CodeSFX logo - Sheldon Marshall

@@ -291,7 +291,7 @@ async function runWithCodeSFX(context) {
                             break;
                         // general error
                         default:
-                            playSFX(context, "(while_coding_warning)A4_triangle_440hz_0.1s.wav");
+                            playSFX(context, "GeneralError.wav");
                             console.log("General error sound played!");
                     }
                     vscode.workspace
@@ -302,7 +302,7 @@ async function runWithCodeSFX(context) {
                     // no errors
                 }
                 else {
-                    playSFX(context, "(no_errors)A5_sine_880hz_0.1s.wav");
+                    playSFX(context, "AllClear.wav");
                     console.log("All-clear sound played!");
                     // set selection color back to default
                     vscode.workspace

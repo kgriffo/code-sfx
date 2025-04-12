@@ -251,7 +251,7 @@ export async function runWithCodeSFX(context: vscode.ExtensionContext) {
               break;
 
             // stack overflow
-            case output.includes("RecursionError") || //pthon
+            case output.includes("RecursionError") || //python
               output.includes("StackOverflowError"): //java
               playSFX(context, "StackOverflow.wav");
               console.log("Stack overflow sound played!");

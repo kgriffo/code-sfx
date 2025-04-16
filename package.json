@@ -1,6 +1,7 @@
 {
   "name": "codesfx",
   "displayName": "CodeSFX",
+  "publisher": "kgriffo",
   "description": "CodeSFX plays sound effects based on warnings and errors in your code both while writing it, and after running it.",
   "version": "1.0.0",
   "engines": {
